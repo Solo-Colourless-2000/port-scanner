@@ -16,7 +16,7 @@ python3 report_diff.py --help
 python3 -m unittest discover -s tests -v
 ```
 
-`--help` は `argparse` が表示する実行可能なオプションを確認するための引数です。スキャンはしません。`unittest` の `-m` は標準ライブラリのモジュールを起動し、`discover` は指定した `tests` ディレクトリからテストを検索、`-v` は各テスト名・結果を表示します。今回の見本はスキャナ14件、比較ツール35件の合計49件です。この数は将来の自作版に追加したテスト数とは別に記録してください。
+`--help` は `argparse` が表示する実行可能なオプションを確認するための引数です。スキャンはしません。`unittest` の `-m` は標準ライブラリのモジュールを起動し、`discover` は指定した `tests` ディレクトリからテストを検索、`-v` は各テスト名・結果を表示します。同梱の見本にはスキャナ14件、比較ツール37件の計51件のテストがあります。この数は将来の自作版に追加したテスト数とは別に記録してください。
 
 期待する停止条件は、未許可の対象指定を拒否すること、既存の `before.json` / `after.json` / `difference.json` を勝手に上書きしないこと、ループバック以外の通信を起こさないことです。
 
@@ -174,8 +174,8 @@ git rev-parse HEAD
 **一次資料：** このZIPの `portfolio_lab/scanner.py`、`report_diff.py`、両テスト、`README.md`、書籍サンプル `original_source.zip`。他の既存Libraryファイルから技術的な内容を補っていません。
 
 
-## 960周版：単独検証コマンドと成果物の証拠化
+## 単独検証コマンドと成果物の証拠化
 
 比較前に `python3 report_diff.py --validate before.json` と `python3 report_diff.py --validate after.json` を実行してください。実行したディレクトリ、終了コード、標準出力・標準エラーを記録します。出力が `VALID` でも実測を証明するわけではなく、JSONが現在のプログラムの受理条件を満たすだけです。複数引数モードは `--before ... --after ...`、単独検証モードは `--validate ...` で、混用できません。
 
-再現試験の入力異常（未知キー・欠落キー）、異常系テスト、GitHubへの公開前確認については `VALIDATION_AND_PORTFOLIO_EVIDENCE_V960.md` を読み、サンプルの見本から自分が改良した差分を残してください。
+再現試験の入力異常（未知キー・欠落キー）、異常系テスト、GitHubへの公開前確認については `VALIDATION_AND_EVIDENCE.md` を読み、サンプルの見本から自分が改良した差分を残してください。

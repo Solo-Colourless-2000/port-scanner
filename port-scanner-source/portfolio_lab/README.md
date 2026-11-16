@@ -102,7 +102,7 @@ python3 report_diff.py --before before.json --after after.json --output differen
 `report_diff.py` は `open` なのに errno が0以外、`open`以外なのに errno が0である入力を拒否します。後者も含めて非ゼロの失敗番号をOS共通の定数と誤認しないよう、異常系2件と正常系1件のテストを追加しました。合計51件。運用例と転職応募用の本人実装・テスト証拠の作り方は [`docs/PORTFOLIO_OPERATOR_MANUAL.md`](docs/PORTFOLIO_OPERATOR_MANUAL.md) を参照してください。
 
 
-## JSON単独検証と公開用の検証証拠（960周改訂）
+## JSON単独検証と公開用の検証証拠（追加学習）
 
 ```sh
 cd portfolio_lab
@@ -111,9 +111,9 @@ python3 report_diff.py --validate after.json
 python3 report_diff.py --before before.json --after after.json --output difference.json
 ```
 
-`--validate` は入力JSONの必須フィールド・余分なフィールド・型・範囲を確認します。正常なら `VALID:` と終了コード0、不正なら終了コード2です。オフライン検証であり実際にTCP通信しません。**真正性の証明ではない**点を README・面接で説明してください。詳しい作業は `docs/VALIDATION_AND_PORTFOLIO_EVIDENCE_V960.md` を参照してください。
+`--validate` は入力JSONの必須フィールド・余分なフィールド・型・範囲を確認します。正常なら `VALID:` と終了コード0、不正なら終了コード2です。オフライン検証であり実際にTCP通信しません。**真正性の証明ではない**点を README・面接で説明してください。詳しい作業は `docs/VALIDATION_AND_EVIDENCE.md` を参照してください。
 
 
-### v984: JSON文字コードの検証
+### JSON文字コードの検証
 
-比較ツールはUTF-8（BOMなし）だけを受理します。`json.loads(bytes)`が自動判定するUTF-16/32/BOM付き入力を、decode("utf-8")→json.loads(text)の順序により拒否します。詳細と検証方法は `docs/UTF8_JSON_INPUT_POLICY_V984.md` を参照してください。
+比較ツールはUTF-8（BOMなし）だけを受理します。`json.loads(bytes)`が自動判定するUTF-16/32/BOM付き入力を、decode("utf-8")→json.loads(text)の順序により拒否します。詳細と検証方法は `docs/UTF8_JSON_INPUT_POLICY.md` を参照してください。

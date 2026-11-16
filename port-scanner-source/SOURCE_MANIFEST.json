@@ -2,7 +2,7 @@
   "source_zip": "pentest-starting-with-port-scanner-main.zip",
   "kind": "source-aligned manual",
   "source_sha256": "f34eb7b225d9f16bea616e08f7866ea8d62964c9fd9608d9caa1997ef9fc8bed",
-  "manual": "portscanner_pentest_development_manual_v984_20261117.html",
+  "manual": "portscanner_pentest_development_manual.html",
   "generated": "2026-11-15",
   "files": {
     "containers/compose.yaml": {

@@ -38,7 +38,7 @@ touch report_diff.py tests/test_report_diff.py
 python3 --version
 ```
 
-`mkdir -p` は必要な親ディレクトリを作り、`touch` は既存のファイルを削除せずに存在を確保します。`cd my_report_diff` 後は、ここがテスト実行と相対パスの基準です。HTMLの10工程に従い、1回の工程で示された行範囲だけ入力してください。先に `report_diff.py`、次に `tests/test_report_diff.py`、また `report_diff.py` と、実際の開発のように往復します。工程の途中では依存関数が未完成のためテストが失敗する場合があります。完成後にまとめて全49件のテストを実行してください。
+`mkdir -p` は必要な親ディレクトリを作り、`touch` は既存のファイルを削除せずに存在を確保します。`cd my_report_diff` 後は、ここがテスト実行と相対パスの基準です。HTMLの10工程に従い、1回の工程で示された行範囲だけ入力してください。先に `report_diff.py`、次に `tests/test_report_diff.py`、また `report_diff.py` と、実際の開発のように往復します。工程の途中では依存関数が未完成のためテストが失敗する場合があります。完成後にまとめて全51件のテストを実行してください。
 
 ## 4. 完成版の使用方法：ローカル環境だけを使用
 
@@ -99,7 +99,7 @@ python3 -m unittest discover -s tests -v
 python3 report_diff.py --help
 ```
 
-現在の学習見本では、従来の14テストに、比較機能の35テストを追加し、合計49件です。`test_report_diff.py` はファイルを一時ディレクトリに作り、不正JSON、重複キー、重複ポート、bool型のポート、タイムゾーンなしの日時、NaN、ファイル上書き拒否を再現します。実ネットワークは使用しません。テスト結果には「Ran 49 tests / OK」のような集約結果だけでなく、テスト名と実行環境も記録してください。
+現在の学習見本では、従来の14テストに、比較機能の37テストを追加し、合計51件です。`test_report_diff.py` はファイルを一時ディレクトリに作り、不正JSON、重複キー、重複ポート、bool型のポート、タイムゾーンなしの日時、NaN、ファイル上書き拒否を再現します。実ネットワークは使用しません。テスト結果には「Ran 49 tests / OK」のような集約結果だけでなく、テスト名と実行環境も記録してください。
 
 ## 7. 転職活動のための独立改善課題
 
@@ -120,7 +120,7 @@ HTTPレスポンスを取得する機能、脆弱性の検出、SYNスキャン�
 **参照：** 本配布物の `portfolio_lab/scanner.py`、`report_diff.py`、`tests/test_scanner.py`、`tests/test_report_diff.py`、原典ZIP内のREADMEとChapter 02のTCPスキャナ（学習テーマの一次資料）。
 
 
-## 9. UTC・スコープ・待機時間の一貫性（800周改訂版）
+## 9. UTC・スコープ・待機時間の一貫性（入力検証の強化）
 
 初版の比較処理では対象・ポート・scopeが同じでも`timeout_seconds`が異なる二回の測定が比較できていました。今回の改訂では、値が違えば`reports must use the same TCP connection timeout`と明示して中止します。比較JSONにscopeとtimeoutも含めます。
 

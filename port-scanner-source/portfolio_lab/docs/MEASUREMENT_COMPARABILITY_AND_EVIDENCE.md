@@ -100,4 +100,4 @@ Limitations and next improvements:
 
 このひな型の空欄は自分の測定値で埋めてください。先に作成した教材の実行ログを改変して「自分の成果」にするものではありません。
 
-**参照**：本配布ZIPの`portfolio_lab/scanner.py`、`report_diff.py`、`tests/test_scanner.py`、`tests/test_report_diff.py`、および添付原典ZIP。検査した範囲と未実測の範囲は`REVIEW_REPORT.txt`で区別します。
+**参照**：本配布ZIPの`portfolio_lab/scanner.py`、`report_diff.py`、`tests/test_scanner.py`、`tests/test_report_diff.py`、および添付原典ZIP。検査した範囲と未実測の範囲は、自分の試験報告書で区別して記録してください。
