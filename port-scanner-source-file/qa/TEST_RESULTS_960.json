@@ -1,0 +1,19 @@
+{
+  "release": "v960",
+  "source_original_files": 43,
+  "original_source_lines": 946,
+  "source_steps": 107,
+  "portfolio_scanner_lines": 237,
+  "portfolio_scanner_steps": 19,
+  "report_diff_lines": 497,
+  "report_diff_steps": 10,
+  "unittest_tests_passed": 49,
+  "pre_revision_machine_rounds": 40,
+  "post_revision_machine_rounds": 40,
+  "checks_per_round": 19,
+  "local_tcp_open_to_refused_test": "PASS",
+  "single_json_validation_integration": "PASS",
+  "manual_browser_reload_persistence": "NOT VERIFIED: local navigation blocked",
+  "offensive_examples_executed": false,
+  "manual_complete_human_readings_claimed": false
+}

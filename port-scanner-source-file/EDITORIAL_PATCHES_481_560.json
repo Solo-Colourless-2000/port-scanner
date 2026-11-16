@@ -1,0 +1,221 @@
+{
+  "revision": "481-560",
+  "source": "user-attached original_source.zip (original book) and prior 480-round teaching ZIP",
+  "nature": "individual authored source-context explanations, not counted as automated passes",
+  "original_source_notes_revised": [
+    {
+      "path": "containers/compose.yaml",
+      "line": 23,
+      "new_description": "`tty: true` はnginxコンテナへ疑似端末（PTY）を割り当てる設定。nginxのHTTP通信を可能にする指定ではなく、コンテナ内の対話操作に関わる。`tty` はComposeのキー、`true` はYAMLの真偽値。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 30,
+      "new_description": "`ports:` はnginxコンテナの待受ポートをホスト側へ公開する一覧の親キー。次の行の127.0.0.1によるバインド先を読み、外部への公開範囲を判断する。これ自体はnginxのlisten設定を変更しない。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 38,
+      "new_description": "PostgreSQL演習コンテナへ `tty: true` で擬似端末を割り当てる。psqlが利用できるかや認証成功とは関係がなく、標準入出力の端末扱いを変えるだけ。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 41,
+      "new_description": "PostgreSQLサービスの `networks:` で参加先ネットワークの一覧を開始する。後続の `net-10.8.9.0` と `ipv4_address: 10.8.9.4` は同じサービスの設定。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 43,
+      "new_description": "PostgreSQLコンテナの専用ネットワーク内IPv4アドレスとして `10.8.9.4` を指定する。ホスト側の127.0.0.1や5432ポートとの対応とは別の設定。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 44,
+      "new_description": "PostgreSQLコンテナのMACアドレスを `02:42:0a:08:09:04` に固定する指定。MACは同一L2ネットワーク上で用いる識別子で、ホスト側のTCPポート番号ではない。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 45,
+      "new_description": "`ports:` はPostgreSQLのホスト側ポート公開設定の開始。下位項目でホストIP、ホストポート、コンテナポートを読み、パスワード認証設定とは切り離して確認する。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 49,
+      "new_description": "SSH演習コンテナ用のイメージビルド設定を開始する。`build` の子にある `context` と `dockerfile` がどのDockerfileを使うか決める。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 53,
+      "new_description": "`tty: true` をSSHコンテナに指定する。SSH接続そのものには不要であり、コンテナの仮想端末扱いに関わるCompose設定。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 59,
+      "new_description": "SSHコンテナの仮想NICに固定MACアドレス `02:42:0a:08:09:05` を設定する。IPアドレスの代わりにSSHクライアントが入力する値ではない。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 60,
+      "new_description": "SSHコンテナのホストポート公開指定の親キー `ports:`。次の行のIP:ポート:ポート対応を読まなければ到達可能範囲は分からない。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 87,
+      "new_description": "診断用pentesterサービスを `net-10.8.9.0` に接続するComposeのネットワーク名。後続の固定IPがサービス側の設定になる。ホストのIP設定ではない。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 96,
+      "new_description": "`ipam` の子の `config:` は演習用BridgeネットワークのIPアドレス管理設定を列挙する。次行の `subnet` が利用するCIDRを指定する。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-v1.py",
+      "line": 28,
+      "new_description": "`print` は画面表示用の組み込み関数。文字列 `Send ACK packet:` を標準出力へ出してからACKを生成・送信する流れを示すが、この行自体はTCPパケットを送信しない。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-v2.py",
+      "line": 40,
+      "new_description": "右辺の `ip_layer/fin_tcp_layer` はScapyの `/` 演算子でIP層とTCP(FIN)層を連結し、送信用パケットを作る。`=` は結果を `fin_packet` に代入する記号。この行だけではネットワークへ送っていない。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 8,
+      "new_description": "`}` はシェルの `usage() { ... }` 関数本体を閉じる波括弧。関数宣言はここで終わるが、まだ自動的にヘルプが表示されるわけではない。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 15,
+      "new_description": "`fi` は先頭引数がないか確認する `if ... then ... fi` のブロックを閉じるシェル構文。`exit 1` が実行された場合はここへ戻らない。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 20,
+      "new_description": "この `fi` は `--help` 引数が指定されたときに `usage` して正常終了する条件分岐を閉じる。対象の必須引数判定を閉じるL15の `fi` とは別の対応。"
+    },
+    {
+      "path": "code/chapter03/nmap-xml2csv.rb",
+      "line": 10,
+      "new_description": "Rubyの `end` は `opt.on` の `do ... end` ブロックを閉じる。コマンドラインオプションが処理された場合に実行するヘルプ表示の処理範囲をここで終える。"
+    },
+    {
+      "path": "code/chapter03/nmap-xml2csv.rb",
+      "line": 14,
+      "new_description": "この `}` は `OptionParser.new { |opt| ... }` の波括弧ブロックを閉じる。L10の `end` は内部の `opt.on` を閉じるため、閉じる対象が違う。"
+    },
+    {
+      "path": "code/chapter03/nmap-xml2csv.rb",
+      "line": 37,
+      "new_description": "`end` は直前の `if` による末尾区切り記号の調整処理を閉じる。Rubyのメソッド定義全体ではなく、この条件に対応する。"
+    },
+    {
+      "path": "code/chapter03/nmap-xml2csv.rb",
+      "line": 47,
+      "new_description": "`end` で `File.open` へ渡した `do` ブロックが終わり、ブロックを抜けるとファイルオブジェクトが自動で閉じられる。Rubyの `File.open(path) do |f|` 構文の効果。"
+    },
+    {
+      "path": "containers/nginx/vulnerable.conf",
+      "line": 8,
+      "new_description": "この `}` は最初の `location / { ... }` ブロックを閉じる。ルートパス向けのリクエスト処理に適用する設定がここで終了するが、`server` 全体はまだ続く。"
+    },
+    {
+      "path": "containers/nginx/vulnerable.conf",
+      "line": 12,
+      "new_description": "この `}` は静的パス向けの `location` ブロックを閉じる。`alias` の参照先やURIの対応はこのブロックに適用され、他のlocationには波及しない。"
+    },
+    {
+      "path": "containers/bind/config/named.conf",
+      "line": 40,
+      "new_description": "`};` はBINDの `options { ... };` 全体の終了。`}` で設定の集合を閉じ、`;` でnamed.confの文を終える。Cの構造体宣言ではない。"
+    },
+    {
+      "path": "containers/bind/config/example.com.zone",
+      "line": 9,
+      "new_description": "閉じ丸括弧 `)` でSOAリソースレコードの複数行にわたる値を閉じる。括弧内のシリアル番号、更新間隔、再試行間隔などはDNSゾーン管理に使われる。"
+    },
+    {
+      "path": "code/chapter05/shellcode-runner.go",
+      "line": 26,
+      "new_description": "`*/` はGoソースの冒頭に置かれたcgo用Cコードを含むブロックコメントを閉じる。ここまでがCコンパイラへ渡す部分であり、次の `import \"C\"` からGo側の定義に戻る。"
+    }
+  ],
+  "portfolio_inserted_line_descriptions": [
+    {
+      "path": "scanner.py",
+      "line_code": "    except TimeoutError:",
+      "description": "`except` は直前の `try` 内で発生した例外を捕捉する構文。`TimeoutError` は接続試行が時間切れで失敗した場合の例外型で、`OSError` の一種でもある。より広い `OSError` より先に置くことで、この例外を専用の分岐で処理できる。インデント4個は `try` と同じ階層。"
+    },
+    {
+      "path": "scanner.py",
+      "line_code": "        code = errno.ETIMEDOUT",
+      "description": "`code` は後続のポート状態分類で参照するローカル変数。`=` は右辺の値を左辺へ束縛する代入演算子。`errno.ETIMEDOUT` はPython標準ライブラリの「時間切れ」に対応するエラー定数で、例外オブジェクトに `.errno` がない場合でも一定の分類ができる。ここでは通信を再試行していない。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "import errno",
+      "description": "テスト側でもOSのエラーコード定数を参照するため `errno` モジュールを読み込む。モジュール名 `errno` は `ETIMEDOUT`（時間切れ）と `ENETUNREACH`（ネットワーク到達不能）などの名前を提供する。エラーの数値自体はOSに依存するため固定値を書かない。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "from unittest.mock import patch",
+      "description": "`from ... import ...` はモジュールの特定の名前を取り込む構文。`unittest.mock.patch` は指定した参照をテスト実行中だけ差し替え、実際のネットワークに接続せず「通信が失敗した状況」を再現する。`with` ブロックの終了後には差し替えが戻る。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "class ProbeErrorTests(unittest.TestCase):",
+      "description": "`class` で例外処理だけを独立検証するテストクラスを定義。`ProbeErrorTests` は任意のクラス名、丸括弧内の `unittest.TestCase` はassert系メソッドを提供する基底クラス、末尾の `:` はインデントされたクラス本体の開始を意味する。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "    def test_timeout_exception_without_errno(self):",
+      "description": "`def` は関数（ここではテストメソッド）の定義。`test_` で始まる名前は `unittest` に自動検出される。`self` はこのテストクラスのインスタンスを受け取る引数で、続く `:` 以下を1つのテストとして実行する。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "        with patch(\"scanner.socket.socket\") as mocked:",
+      "description": "`with` はモック差し替えの適用期間を限定する。`patch(\"scanner.socket.socket\")` は `scanner` モジュール内で参照されるソケット生成関数だけを差し替える。`as mocked` は差し替え用モックを `mocked` に受け取る。文字列中のドットはモジュール・属性の参照経路で、ファイルパスではない。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "            mocked.return_value.__enter__.return_value.connect_ex.side_effect = TimeoutError()",
+      "description": "モックの `return_value` は関数呼び出し結果、`__enter__.return_value` は `with socket.socket(...) as sock` で得られるオブジェクトを示す。そこで `connect_ex` の `side_effect` に `TimeoutError()` を代入し、実通信なしで時間切れの例外を起こす。`=` は属性への代入。長い参照経路を短絡して読むと、モックが「どの場所で」働くかを誤解する。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "            result = probe(\"127.0.0.1\", 8765, 0.2)",
+      "description": "`probe()` にループバックIPv4、ポート8765、タイムアウト0.2秒を渡す。ここでは `patch` が有効なのでOSへTCP接続は行われない。戻った辞書を `result` へ保存する。実際の時間経過を待つテストではない。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "        self.assertEqual(result[\"state\"], \"timeout\")",
+      "description": "`self.assertEqual(a,b)` は2つの値が同じであることを確認するテストの検証点。`result[\"state\"]` は結果辞書の `state` キーの値で、期待する文字列 `\"timeout\"` と比較。ここが誤ると接続の時間切れを不明エラーと表示してしまう。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "        self.assertEqual(result[\"errno\"], errno.ETIMEDOUT)",
+      "description": "`result[\"errno\"]` に結果へ記録したエラーコードが入り、`errno.ETIMEDOUT` と一致するか検証する。表示テキストだけでなく機械処理する数値フィールドの一貫性も確認している。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "    def test_unreachable_errno_without_external_traffic(self):",
+      "description": "`test_` で始まる2件目のメソッド。接続試行が `ENETUNREACH`（ネットワークに経路がない）を返したケースを外部通信なしで試す。タイムアウトと到達不能を同一視しないためのテスト。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "            mocked.return_value.__enter__.return_value.connect_ex.return_value = errno.ENETUNREACH",
+      "description": "`side_effect` で例外を起こすのではなく `connect_ex` の `return_value` を `errno.ENETUNREACH` に設定する。これはsocket APIが例外を投げずエラー番号を戻す経路を再現する。`return_value` はテスト用の値で、OSの実際の接続結果ではない。"
+    },
+    {
+      "path": "tests/test_scanner.py",
+      "line_code": "        self.assertEqual(result[\"state\"], \"unreachable\")",
+      "description": "モックから返した `ENETUNREACH` に対して分類ラベルが `unreachable` になることを検証。到達不能は「閉じているポート」とは別概念であり、ネットワーク経路・ICMP応答・OSの状況を調査すべきことを意味する。"
+    }
+  ],
+  "portfolio_fix": "TimeoutError is OSError subclass; catch it before OSError and classify with errno.ETIMEDOUT; mocked timeouts and unreachable errno added",
+  "guidance": [
+    "8-day portfolio build workflow",
+    "reproducible evidence and test-ID guide",
+    "TCP/OS error guide",
+    "mobile inline-code overflow correction"
+  ]
+}

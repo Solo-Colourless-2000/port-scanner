@@ -1,0 +1,316 @@
+{
+  "original_line_changes": [
+    {
+      "step": 34,
+      "line": 18,
+      "source": "  usage",
+      "before": "引数の使い方を表示する。",
+      "after": "引数が「-h」の場合にusage関数を呼び、先ほど定義した利用方法の2行を標準出力へ表示する。usageはShell関数名で、ネットワークスキャンは行わない。"
+    },
+    {
+      "step": 34,
+      "line": 19,
+      "source": "  exit 0",
+      "before": "exit 0 で正常終了する。",
+      "after": "exit 0はヘルプを正常に表示したことをシェルの終了コード0で報告する。直前のusageが成功した後、下のNmap処理には進ませない。"
+    },
+    {
+      "step": 35,
+      "line": 26,
+      "source": "fi",
+      "before": "日付ディレクトリ作成条件の終了。",
+      "after": "fiはif [ ! -d ./results/${today} ]の条件分岐を閉じる。mkdir -pで日付別ディレクトリを作る処理はここで終了し、その後に時刻を取得する。"
+    },
+    {
+      "step": 38,
+      "line": 40,
+      "source": "else",
+      "before": "除外ファイルがないときの分岐。",
+      "after": "elseは「引数がちょうど3つ」という判定の反対側。除外ホスト指定がない場合にexclude_optionを空にし、Nmap引数に--excludeを加えない。"
+    },
+    {
+      "step": 38,
+      "line": 41,
+      "source": "  exclude_option=\"\"",
+      "before": "除外対象がなければ空文字列にする。",
+      "after": "exclude_option=\"\"で除外指定に使う変数を空文字列へ変更する。引用符は空の値を表し、次のNmap起動で除外引数を指定しない。"
+    },
+    {
+      "step": 41,
+      "line": 31,
+      "source": "          end",
+      "before": "初回ポートの判定ブロックを閉じる。",
+      "after": "endはif !rowを閉じる。最初のopenポートにだけホストIPとタブを先頭に追加する部分が終わり、次に各openポートの番号・サービスを連結する。"
+    },
+    {
+      "step": 41,
+      "line": 33,
+      "source": "        end",
+      "before": "open判定ブロックを閉じる。",
+      "after": "endはport.state.to_s == \"open\"の条件分岐を閉じる。closed等のポートはここまでの出力処理に入らない。"
+    },
+    {
+      "step": 41,
+      "line": 34,
+      "source": "      end",
+      "before": "当該ポートの処理ブロックを閉じる。",
+      "after": "endはhost.each_portの繰り返しを閉じる。対象ホストのポートを全件見終えた後、末尾の区切り文字の処理に移る。"
+    },
+    {
+      "step": 42,
+      "line": 41,
+      "source": "    end",
+      "before": "ホスト生存判定を閉じる。",
+      "after": "endはホストがupかの判定を閉じる。downホストではopenポート一覧の行を作らない。"
+    },
+    {
+      "step": 42,
+      "line": 42,
+      "source": "  end",
+      "before": "ホストの繰り返し処理を閉じる。",
+      "after": "endはxml.each_hostでホストを順に処理するブロックを閉じる。次のendはさらに外側のXMLを開くブロックを閉じる。"
+    },
+    {
+      "step": 42,
+      "line": 43,
+      "source": "end",
+      "before": "XMLパースのブロックを閉じ、読み取りを終える。",
+      "after": "endはNmap::XML.open(nmap_file)へ渡したdo |xml|ブロックを閉じる。XML解析で作ったresultを次のputsへ渡す。"
+    },
+    {
+      "step": 43,
+      "line": 49,
+      "source": "puts '-----------------------------------------------------'",
+      "before": "結果出力の区切り線。",
+      "after": "putsに繰り返しハイフンを渡し、結果の標準出力と後続の出力先通知の間に区切り線を印字する。ファイル内容は変更しない。"
+    },
+    {
+      "step": 43,
+      "line": 50,
+      "source": "puts '[+] Output: ' + output_file",
+      "before": "文字列連結 + で書き込み先のファイル名を表示する。",
+      "after": "putsの引数に\"[+] Output: \"とoutput_fileを+で連結する。実際にFile.openで書き込んだパスを画面に表示する。"
+    },
+    {
+      "step": 59,
+      "line": 11,
+      "source": "};",
+      "before": "ACLブロックを閉じる。",
+      "after": "};はacl \"internal-network\" {から始まる許可対象ネットワーク定義を閉じる。直前の10.8.9.0/24がこのACLに属する。"
+    },
+    {
+      "step": 68,
+      "line": 48,
+      "source": "        };",
+      "before": "一般ログチャネルの設定を閉じる。",
+      "after": "};はchannel \"log_default\"の設定を終える。file・print-time・severity・print-categoryがこの1つのログ出力先に適用される。"
+    },
+    {
+      "step": 69,
+      "line": 55,
+      "source": "        };",
+      "before": "alertチャネルを閉じる。",
+      "after": "};はchannel \"alert\"の設定を閉じる。このチャネルは/var/log/alert.logへinfo以上の情報を出す設定。"
+    },
+    {
+      "step": 69,
+      "line": 59,
+      "source": "                print-time yes;",
+      "before": "queryログへ日時を付ける。",
+      "after": "print-time yes;はqueryチャネルのログレコードへ日時を付ける。yesは有効化、末尾の;はBIND設定行の終端。"
+    },
+    {
+      "step": 69,
+      "line": 60,
+      "source": "                print-severity yes;",
+      "before": "queryログへ重要度を付ける。",
+      "after": "print-severity yes;はqueryチャネルの各ログに重要度を付ける。severity debugで選んだ記録レベルとの違いに注意する。"
+    },
+    {
+      "step": 69,
+      "line": 61,
+      "source": "                print-category yes;",
+      "before": "queryログへカテゴリー名を付ける。",
+      "after": "print-category yes;はqueryチャネルの各ログにカテゴリー名を表示する。後のcategory queriesでこのチャネルへ振り分ける。"
+    },
+    {
+      "step": 69,
+      "line": 62,
+      "source": "        };",
+      "before": "queryチャネルを閉じる。",
+      "after": "};でchannel \"query\"の設定を閉じる。query.logの出力先・レベル・表示項目を確定した後、categoryへ進む。"
+    },
+    {
+      "step": 70,
+      "line": 68,
+      "source": "};",
+      "before": "logging全体を閉じる。",
+      "after": "};でlogging全体の設定ブロックを終了する。上で定義したchannelとcategoryの対応付けがここまでに含まれる。"
+    },
+    {
+      "step": 70,
+      "line": 73,
+      "source": "};",
+      "before": "ルートヒント用ゾーン定義を閉じる。",
+      "after": "};はzone \".\" INでルートヒントを指定したゾーンの終了。type hintとfile \"named.root\"はこのゾーンだけの設定。"
+    },
+    {
+      "step": 73,
+      "line": 24,
+      "source": "else:",
+      "before": "応答を受け取った場合の分岐。",
+      "after": "else:はif response...の偽側の処理を開始する。応答がなかったことだけでDNSサーバーが安全とは判断できない。"
+    },
+    {
+      "step": 77,
+      "line": 11,
+      "source": "\t}",
+      "before": "mainメソッドを閉じる。",
+      "after": "}はSpring Bootアプリのmainメソッドを閉じる。mainはSpringApplication.run(...)の起動呼出しを含む。"
+    },
+    {
+      "step": 80,
+      "line": 15,
+      "source": "dependencies {",
+      "before": "依存関係の宣言ブロックを開始する。",
+      "after": "dependencies {はGradleの依存ライブラリ宣言ブロックを開始する。後続のimplementation/testImplementationがJavaアプリへ含まれるライブラリを指定する。"
+    },
+    {
+      "step": 80,
+      "line": 21,
+      "source": "}",
+      "before": "依存関係の宣言ブロックを閉じる。",
+      "after": "}はdependenciesを閉じる。直前のLog4j2依存やテスト用ライブラリ定義はここで終了する。"
+    },
+    {
+      "step": 80,
+      "line": 23,
+      "source": "test {",
+      "before": "test { でテストタスクの設定を開始する。",
+      "after": "test {はGradleのtestタスクの構成ブロックを開始する。次行のuseJUnitPlatform()をこのタスクへ適用する。"
+    },
+    {
+      "step": 80,
+      "line": 25,
+      "source": "}",
+      "before": "テスト設定ブロックを閉じる。",
+      "after": "}はtestタスクの設定ブロックを閉じる。Java単体テストが成功したことを示す行ではない。"
+    },
+    {
+      "step": 83,
+      "line": 22,
+      "source": "        }",
+      "before": "mmap失敗時の分岐を閉じる。",
+      "after": "}はmmapがMAP_FAILEDだった場合のifブロックを閉じる。失敗時はperror後にreturnし、成功時だけ後続のmemcpyへ進む。"
+    },
+    {
+      "step": 84,
+      "line": 25,
+      "source": "}",
+      "before": "C関数 call の閉じ波括弧。",
+      "after": "}はCのcall(char*, size_t)関数本体を閉じる。後ろの*/でcgoへ渡すCコードコメント領域が終了する。"
+    },
+    {
+      "step": 86,
+      "line": 28,
+      "source": "import (",
+      "before": "複数パッケージimportの開始。",
+      "after": "import (はGoの複数パッケージimportグループの開始。次行のencoding/hexは文字列からバイト列をデコードし、unsafeはポインタ変換に使われる。"
+    },
+    {
+      "step": 86,
+      "line": 31,
+      "source": ")",
+      "before": "import宣言を閉じる。",
+      "after": ")はGoのimportグループを閉じる。Cコードの関数呼出しではなく、encoding/hexとunsafeの取込宣言の終わり。"
+    },
+    {
+      "step": 105,
+      "line": 11,
+      "source": "    name: Spell Check with Typos",
+      "before": "ジョブの表示名を設定する。",
+      "after": "name: Spell Check with TyposはGitHub Actionsのジョブの表示名。ワークフローの実行条件を変更するキーではない。"
+    },
+    {
+      "step": 105,
+      "line": 17,
+      "source": "    - name: Check spelling of files in repository",
+      "before": "スペル検査工程の表示名。",
+      "after": "- name: Check spelling of files in repositoryはstepの表示名。続くusesで実行するtyposアクションを説明する文字列。"
+    }
+  ],
+  "report_diff_stages": [
+    {
+      "stage": 1,
+      "path": "report_diff.py",
+      "start": 1,
+      "end": 13,
+      "title": "比較ツールの入口と許容状態"
+    },
+    {
+      "stage": 2,
+      "path": "tests/test_report_diff.py",
+      "start": 1,
+      "end": 24,
+      "title": "先に入力レポートのモデルを作る"
+    },
+    {
+      "stage": 3,
+      "path": "report_diff.py",
+      "start": 14,
+      "end": 38,
+      "title": "バイト数・JSON・対象IPの検証"
+    },
+    {
+      "stage": 4,
+      "path": "tests/test_report_diff.py",
+      "start": 25,
+      "end": 75,
+      "title": "ファイル入力の異常系を先に確認"
+    },
+    {
+      "stage": 5,
+      "path": "report_diff.py",
+      "start": 39,
+      "end": 68,
+      "title": "日時・状態・errnoの入力検証"
+    },
+    {
+      "stage": 6,
+      "path": "tests/test_report_diff.py",
+      "start": 76,
+      "end": 105,
+      "title": "時刻・長さ・状態変化の検証"
+    },
+    {
+      "stage": 7,
+      "path": "report_diff.py",
+      "start": 69,
+      "end": 95,
+      "title": "前後のスキャン結果を比較する"
+    },
+    {
+      "stage": 8,
+      "path": "tests/test_report_diff.py",
+      "start": 106,
+      "end": 139,
+      "title": "比較時の誤判定を防ぐ"
+    },
+    {
+      "stage": 9,
+      "path": "report_diff.py",
+      "start": 96,
+      "end": 121,
+      "title": "CLIと安全なJSON出力を実装する"
+    },
+    {
+      "stage": 10,
+      "path": "tests/test_report_diff.py",
+      "start": 140,
+      "end": 171,
+      "title": "CLI実行と上書き防止を実測する"
+    }
+  ],
+  "report_diff_annotations": 292,
+  "note": "original textbook bytes are unchanged"
+}

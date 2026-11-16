@@ -1,0 +1,26 @@
+{
+  "python_unittest": "44 PASS",
+  "rounds": "801-880; 40 pre+40 post",
+  "source": "43/43 files 946/946 lines",
+  "portfolio": "237 lines",
+  "comparison": "411 lines",
+  "browser": {
+    "desktop": {
+      "horizontal_overflow": 0,
+      "js_errors": [],
+      "diff_progress_survived_reload": false,
+      "loading_method": "set_content (localhost navigation blocked)",
+      "search_ok": true,
+      "screenshots": "qa/v880_desktop_reportdiff.png"
+    },
+    "mobile": {
+      "horizontal_overflow": 0,
+      "js_errors": [],
+      "diff_progress_survived_reload": false,
+      "loading_method": "set_content (localhost navigation blocked)",
+      "search_ok": true,
+      "screenshots": "qa/v880_mobile_reportdiff.png"
+    }
+  },
+  "original_exploits_run": false
+}

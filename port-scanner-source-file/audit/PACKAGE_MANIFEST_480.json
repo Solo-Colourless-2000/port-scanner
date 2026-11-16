@@ -1,0 +1,31 @@
+{
+  "edition": "480-round-refined",
+  "date_JST": "2026-11-16",
+  "technical_source": "original_source.zip, user-provided book support repository",
+  "visual_reference": "user-provided SNAKE development manual HTML",
+  "source_sha256": "f34eb7b225d9f16bea616e08f7866ea8d62964c9fd9608d9caa1997ef9fc8bed",
+  "manual_html": "portscanner_pentest_SNAKE_style_480round_refined_manual_20261116.html",
+  "manual_sha256": "592bdbe848162db0fbf28b633a599e0b903208fbd7de82e50ae25324133d7b4e",
+  "original_editable_files": 43,
+  "original_editing_steps": 107,
+  "original_annotated_lines": 946,
+  "portfolio_editing_steps": 19,
+  "portfolio_new_source_files": 3,
+  "portfolio_annotated_lines": 214,
+  "portfolio_python_tests_passed": 11,
+  "usage_subsections": 10,
+  "usage_command_cards": 40,
+  "top_level_chapters": 16,
+  "automated_repeated_multi_criterion_passes_cumulative": 480,
+  "current_edition_pre_edit_passes": 40,
+  "current_edition_post_edit_passes": 40,
+  "automated_criterion_families_each_new_pass": 10,
+  "manual_editorial_rewrites_this_edition": 32,
+  "does_not_claim": "480 human full-document semantic reads",
+  "limits": [
+    "no vulnerable container/offensive sample run",
+    "no Nmap->Ruby full pipeline verification",
+    "no browser-reload progress persistence verification"
+  ],
+  "note": "portfolio_lab is teaching example, not user-authored accomplishment"
+}

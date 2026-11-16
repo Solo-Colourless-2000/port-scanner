@@ -1,0 +1,161 @@
+{
+  "baseline_version": 960,
+  "new_version": 984,
+  "content_changes": [
+    {
+      "path": "report_diff.py",
+      "line": 29,
+      "code": "        text = raw.decode(\"utf-8\")",
+      "explanation": "rawはread()で取得したバイト列。decode(\"utf-8\")はUTF-8の符号化規則に従って文字列textへ変換し、不正なバイト列ではUnicodeDecodeErrorを送出する。JSON解釈の前に文字コードを固定するので、json.loads(bytes)が持つUTF-16/32自動判定を避けられる。"
+    },
+    {
+      "path": "report_diff.py",
+      "line": 31,
+      "code": "            text, object_pairs_hook=no_duplicate_keys,",
+      "explanation": "json.loadsの第1引数をrawのバイト列ではなくUTF-8デコード済みのtextに変更する。object_pairs_hook=no_duplicate_keysは辞書生成時の重複キーを拒否する関数で、文字コード検証とは役割が違う。BOM付きUTF-8も先頭のBOMでJSONDecodeErrorとなり、この教材の受理形式から外れる。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 40,
+      "code": "                read_report(path)",
+      "explanation": "壊れたUTF-8を含むファイルを読み込む。decode(\"utf-8\")のUnicodeDecodeErrorがread_reportのexceptでValueErrorへ変換されるため、呼出し元が統一的に扱える。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 41,
+      "code": "",
+      "explanation": "空行。文字コード検査および次のテストケースを区切り、関数や制御ブロックのインデントには影響を与えない。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 42,
+      "code": "    def test_reports_reject_non_utf8_encodings(self):",
+      "explanation": "unittestのtest_で始まるメソッドとして、文字列がJSONとして正しくても保存文字コードがUTF-8でなければ拒否されるか検査する。テスト本体はネットワーク通信を行わない。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 43,
+      "code": "        for encoding in (\"utf-16\", \"utf-32\", \"utf-8-sig\"):",
+      "explanation": "forはタプル内の3つのエンコーディング名を順にencodingへ代入する。utf-16/utf-32は異なる文字コード、utf-8-sigは先頭にBOMを付ける方式で、いずれもこの教材で明示した厳格なUTF-8無BOMの仕様から外れる。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 44,
+      "code": "            with self.subTest(encoding=encoding), tempfile.TemporaryDirectory() as folder:",
+      "explanation": "subTestは失敗した文字コード名を識別し、TemporaryDirectoryはファイルを自動削除する一時領域を作る。withで両者の管理期間を同時に開始し、各ケースを分離する。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 45,
+      "code": "                path = Path(folder) / \"encoded.json\"",
+      "explanation": "Path(folder)は一時ディレクトリをパスとして表し、/演算子はファイル名encoded.jsonを結合する。書込み場所を検査用の一時フォルダに限定する。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 46,
+      "code": "                path.write_bytes(json.dumps(example()).encode(encoding))",
+      "explanation": "example()で正常な辞書を作り、json.dumpsでJSON文字列へ変換した後、encode(encoding)であえてUTF-8以外またはBOM付きのバイト列にする。write_bytesはそのバイト列をそのままファイルに保存する。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 47,
+      "code": "                with self.assertRaisesRegex(ValueError, \"invalid UTF-8 JSON\"):",
+      "explanation": "assertRaisesRegexは処理がValueErrorを投げ、エラーメッセージにinvalid UTF-8 JSONを含むことを検査する。単に失敗するだけではなく、利用者向けの拒否理由も保証する。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 48,
+      "code": "                    read_report(path)",
+      "explanation": "不正エンコーディングのencoded.jsonをread_reportへ渡す。UTF-8の文字列へ変換できない場合、またはBOMがJSON文法として不正な場合に例外が送出されることを期待する。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 49,
+      "code": "",
+      "explanation": "空行。文字コード検査および次のテストケースを区切り、関数や制御ブロックのインデントには影響を与えない。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 50,
+      "code": "    def test_reports_reject_invalid_utf8_bytes(self):",
+      "explanation": "JSON文法以前にUTF-8として不正なバイト列を拒否できることを検証するメソッドを定義する。単純な文法エラーテストとは分けて原因を切り分ける。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 51,
+      "code": "        with tempfile.TemporaryDirectory() as folder:",
+      "explanation": "TemporaryDirectoryをwithで開き、テスト専用の一時フォルダを取得する。ブロック終了時にテストデータを自動削除するため、作業中のJSONを上書きしない。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 52,
+      "code": "            path = Path(folder) / \"invalid-encoding.json\"",
+      "explanation": "Path型のfolderに/でファイル名を連結し、壊れたバイト列の保存先を組み立てる。文字列の除算ではなくpathlibのパス結合である。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 53,
+      "code": "            path.write_bytes(b\"\\xff\\xfe\\xfa\")",
+      "explanation": "b接頭辞はbytesリテラル。\\xff、\\xfe、\\xfaは16進エスケープであり、単独では正しいUTF-8文字列にならない。write_bytesでUnicode文字列へ変換せず保存し、デコード失敗を確実に再現する。"
+    },
+    {
+      "path": "tests/test_report_diff.py",
+      "line": 54,
+      "code": "            with self.assertRaisesRegex(ValueError, \"invalid UTF-8 JSON\"):",
+      "explanation": "assertRaisesRegexは指定した例外型とメッセージが一致した場合だけ成功する文脈マネージャー。これで文字コード不正がアプリの処理で説明可能なエラーへ変換されることを確認する。"
+    }
+  ],
+  "semantic_bug": "json.loads(bytes) auto-detects UTF-16/32/BOM despite UTF-8 requirement",
+  "resolved_by": "decode UTF-8 before json.loads"
+,
+  "original_source_explanation_edits": [
+  {
+    "path": "containers/compose.yaml",
+    "line": 9
+  },
+  {
+    "path": "containers/compose.yaml",
+    "line": 15
+  },
+  {
+    "path": "containers/compose.yaml",
+    "line": 16
+  },
+  {
+    "path": "code/chapter02/tcp-syn-scan.py",
+    "line": 14
+  },
+  {
+    "path": "code/chapter02/tcp-syn-scan.py",
+    "line": 21
+  },
+  {
+    "path": "code/chapter02/tcp-connect-scan-v2.py",
+    "line": 31
+  },
+  {
+    "path": "code/chapter03/nmap-xml2csv.rb",
+    "line": 29
+  },
+  {
+    "path": "containers/postgres/Dockerfile",
+    "line": 8
+  },
+  {
+    "path": "code/chapter06/libsniffer.c",
+    "line": 8
+  },
+  {
+    "path": "code/chapter06/libsniffer.c",
+    "line": 9
+  },
+  {
+    "path": "code/chapter06/libsniffer.c",
+    "line": 11
+  },
+  {
+    "path": "code/chapter05/shellcode-runner.go",
+    "line": 34
+  }
+]
+}

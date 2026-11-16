@@ -1,0 +1,58 @@
+PORT SCANNER / PENTEST MANUAL: 720-ROUND REFINED EDITION
+Date: 2026-11-16 (JST)
+
+PRIMARY MATERIAL AND EDIT BOUNDARIES
+- Original technical teaching source: original_source.zip, the supplied textbook sample archive in the preceding user-attached ZIP. This is the ONLY authoritative source for the original project.
+- The user-provided SNAKE HTML informed the appearance and explanatory layout, not the port-scanner technical facts.
+- The portfolio_lab/ source is separately authored educational example code; it is not part of the original textbook archive and not proof of the learner's own implementation.
+- Original 43 editable files, 946 lines including blank lines, 107 incremental source-faithful steps remain UNMODIFIED and exactly reconstructed.
+
+FINDINGS AND SEMANTIC EDITS IN THIS REVISION
+1. The standalone report comparator previously accepted different per-port timeout_seconds values for before and after. Such measurements are not directly comparable as the threshold affects the meaning of 'timeout'. compare() now rejects differing timeout values and records the agreed timeout and scope in the output.
+2. timestamp_utc accepted timezone-aware +09:00 or other non-UTC offsets, even though the key specifically promises UTC. read_report() now requires zero UTC offset, distinguishing a valid ISO timestamp from a valid value for this specific schema field.
+3. Declared scope strings in JSON could contradict the target IPv4. read_report() now checks loopback-only declaration, canonical RFC1918 CIDRs at /24 or narrower, and membership of the target in the CIDR. This remains a claimed scope, NOT evidence of legal authorization, IP ownership or source authenticity.
+4. IPv4Network(..., strict=True) can throw a general ValueError for non-network addresses such as 192.168.56.3/24 with host bits set. Both scanner.py and report_diff.py now handle ValueError and transform invalid input into useful errors instead of showing an unexpected traceback.
+5. The interleaved HTML lesson was fully synchronized with the revised independent files. Changed and inserted source lines have individually authored, context-specific Japanese explanations, including a breakdown of the actual variables, expressions, types, error cases, expected output, and neighboring source lines. Unmodified source lines retain their previous reviewed explanations.
+6. New standalone beginner/recruiting document: portfolio_lab/docs/MEASUREMENT_COMPARABILITY_AND_EVIDENCE.md. It includes local-only command-by-command usage, input/exception rationale, safe failure cases, Git provenance, hashes and limits on what each evidential artifact proves, test instructions, and specific interview-ready design claims.
+
+DELIVERED CODE / LESSON COUNTS
+- Textbook (unchanged): 43 source files / 946 explained lines / 107 incremental stages.
+- Independent example scanner + tests + CI: scanner.py 114 lines, tests/test_scanner.py 110 lines, CI configuration 13 lines = 237 explained lines and 19 interactive learning tasks.
+- Offline report comparison: report_diff.py 143 lines, tests/test_report_diff.py 214 lines = 357 explained lines across 10 interleaved stages.
+- Existing usage section: 10 subsections, 40 explanatory command cards; additionally detailed guide covers the revised comparison and input rules.
+- Tests: 14 scanner tests, 25 report-diff tests, 39 Python unittest methods total.
+- Custom original-source amendments: original bytes not changed; new edits concern independent portfolio example and its explanatory text.
+
+REPEATED FULL-ARTIFACT AUTOMATED AUDIT
+- Rounds 641-680: 40 automated passes of the exact previous 640-edition HTML, each combining 19 complete-artifact checking families; each result is bound to the previous HTML SHA-256.
+- Rounds 681-720: 40 automated passes of the exact final 720-edition HTML, each combining 19 complete-artifact checking families and all code/explanation lines; each result is bound to the final HTML SHA-256.
+- Each pass REOPENED and parsed the original ZIP and HTML, checked the 43 original file byte reconstructions and all 946 notes, checked the 237/357 independently authored portfolio lines and their staged reconstructions (233/292 for before), source syntax, navigation, usage and permission discussion, plus rotating real source-line samples.
+- Individual records: audit/REVIEW_ROUNDS_641_680.jsonl and audit/REVIEW_ROUNDS_681_720.jsonl, verified by tests/verify_review_logs.py.
+- 720 automated multi-criterion passes are NOT 720 human semantic rereads. Automated checks cannot prove the prose universally correct or that readers understand every phrase. Source-aware code reading and editorial correction was performed separately.
+
+RUNTIME AND BROWSER VERIFICATION
+- tests/verify_bundle.py: all 43 original source files reconstructed byte-identically, 107 steps, 946 code descriptions, original Python/Shell/Ruby syntax.
+- tests/verify_portfolio.py and verify_report_diff_lesson.py: 237 + 357 source lines rebuilt byte-identically with appropriate individual HTML descriptions and interleaved stages.
+- python3 -m unittest discover -s tests -q (from portfolio_lab/): 39 tests PASS; includes new UTC, mismatched timeout, contradictory scope, noncanonical CIDR and output-preservation regressions.
+- tests/test_local_socket_scanner.py: original textbook socket scanner observed owned 127.0.0.1 listener versus no listener.
+- tests/test_end_to_end_report_diff.py: new scanner captured two owned local TCP states, comparator produced correct offline JSON state-change report.
+- tests/test_safe_usage.py: safe workspace create / mismatch / full match, command help, original safe socket behavior, compile-only C and Go build without executing dangerous payloads.
+- tests/browser_qa_720.py: Chromium 1440x900 desktop and 390x844 mobile, chapter navigation, search, completion input, no page JS exceptions or document horizontal overflow.
+- tests/verify_review_logs.py: all 720 automated pass records and distinct baseline/final SHA-256s verified.
+
+NOT VERIFIED / LIMITS
+- Real browser page reload with localStorage persistence. Browser administrator prevents localhost navigation, so Chromium UI checks used page.set_content for this environment. A checked box in the current page is not proof of reload survival.
+- Deliberately vulnerable Docker services, Log4j CVE/ARP/shellcode/SSL interception demos were NOT executed. Their syntax or build does not prove safety or modern compatibility.
+- Nmap -> Ruby complete runtime pipeline was NOT executed.
+- Distinct OSes may emit different errno values. OS/version and actual returned evidence must be recorded by the learner.
+- Declared scope, source code hash and input JSON validation do not prove an observed event actually occurred, that a user obtained permission, or that a report is authentic. No automatic vulnerability determination is supplied.
+- Original textbook source must not be republished or claimed as personally created work without checking its redistribution conditions. These AI-assisted teaching examples are also not independent learner achievements when copied unchanged.
+
+AUTHORITATIVE FILES AND TRACKING
+- original_source.zip: unchanged primary source.
+- SOURCE_MANIFEST.json, STEP_FRAGMENTS.json: original 43 files and 107 stages.
+- PORTFOLIO_FRAGMENTS.json, REPORT_DIFF_FRAGMENTS.json: current independent example line/stage mapping.
+- EDITORIAL_PATCHES_641_720.json: exact changed source-line annotations for independent examples.
+- CHANGELOG.md, audit/REVIEW_ROUNDS_641_680.jsonl, audit/REVIEW_ROUNDS_681_720.jsonl.
+- audit/BASELINE_640_MANUAL.html.gz and audit/BASELINE_640_REPORT_DIFF/: pre-edit reference snapshots.
+- README_最初に読む.md and portfolio_lab/docs/MEASUREMENT_COMPARABILITY_AND_EVIDENCE.md: first-use and portfolio study guides.

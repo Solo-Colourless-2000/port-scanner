@@ -1,0 +1,81 @@
+{
+  "edition": 800,
+  "baseline_html_sha256": "2170b8bb3d1eb4771b0981ca3a995abda98957623ed678a40084155b239897ec",
+  "final_html_sha256": "5a2aab08735f31a2786d41a3194a619fcf011ec02ca831edd971a6b00e32f8d0",
+  "original_source_zip_sha256": "f34eb7b225d9f16bea616e08f7866ea8d62964c9fd9608d9caa1997ef9fc8bed",
+  "automatic_review_ranges": {
+    "pre": [
+      721,
+      760
+    ],
+    "post": [
+      761,
+      800
+    ]
+  },
+  "review_criterion_families_per_pass": 19,
+  "meaning_of_rounds": "Each round = complete repeated automated integrity/coverage audit; NOT a human reread.",
+  "source_changes": [
+    {
+      "file": "portfolio_lab/report_diff.py",
+      "old_after_line": 84,
+      "new_lines": [
+        85,
+        86,
+        87,
+        88
+      ],
+      "reason": "Cross-field invariants between state=open and errno=0"
+    },
+    {
+      "file": "portfolio_lab/tests/test_report_diff.py",
+      "previous_line": 193,
+      "new_line": 193,
+      "reason": "Test JSON fixture sets refused state and nonzero errno together"
+    },
+    {
+      "file": "portfolio_lab/tests/test_report_diff.py",
+      "new_lines": [
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222,
+        223,
+        224,
+        225,
+        226,
+        227,
+        228,
+        229,
+        230,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240
+      ],
+      "reason": "Three dedicated invariant/rejection/portability tests"
+    }
+  ],
+  "new_manual_documents": [
+    "portfolio_lab/docs/PORTFOLIO_OPERATOR_MANUAL_800.md"
+  ],
+  "source_original_edited": false,
+  "validation_limits": [
+    "Progress reload on real URL not verified",
+    "Vulnerable/offensive labs not executed",
+    "Nmap/Ruby end-to-end not run",
+    "A validated JSON does not prove an authorized real observation"
+  ]
+}

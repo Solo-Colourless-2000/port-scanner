@@ -1,0 +1,728 @@
+{
+  "previous": "240-round edition",
+  "new_main_explanations": 69,
+  "added_focused_unit_explanations": 11,
+  "additional_cross_file_workshops": 10,
+  "patches": [
+    {
+      "path": "containers/compose.yaml",
+      "line": 15,
+      "type": "contextual_main_explanation",
+      "before": "\"127.0.0.1:53:53\" はDockerのポート公開指定。左の127.0.0.1はホストのloopback、最初の53はホストTCPポート、最後の53はコンテナTCPポート。引用符はYAMLでコロンを含む値を安全に文字列として扱うため。コンテナ内部IP10.8.9.2とは別の指定。",
+      "after": "ホスト側の127.0.0.1のTCPポート53を、bindコンテナのTCPポート53へ転送する。3個のコロン区切りの部分はホストIP、ホストポート、コンテナポート。プロトコルを省くとTCPであり、次行の/udpは別の公開指定。DNSはUDPが多いがTCPも利用する。コンテナネットワーク上の10.8.9.2への到達を、このポート公開だけで遮断できるわけではない。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 16,
+      "type": "contextual_main_explanation",
+      "before": "\"127.0.0.1:53:53/udp\" は第15行とは別にUDPの53番を公開する指定。DNSは通常UDPで応答し、サイズや状況によってTCPも使う。`/udp` がなければDockerの既定はTCPなので、両行は重複していない。",
+      "after": "TCPの53番とは独立に、127.0.0.1:53をホスト側のUDPポートとして公開する。末尾の/udpはプロトコル指定であり、ファイル名や割り算ではない。同じ数字のポートでもTCPとUDPは別の通信口となる。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 90,
+      "type": "contextual_main_explanation",
+      "before": "privileged: true はコンテナを特権モードで動かす。ホスト隔離の防御を著しく弱めるため、使うなら専用VM内限定にする。",
+      "after": "pentesterコンテナのみprivileged:trueを指定する。これは単なるrootユーザー指定ではなく、デバイスやカーネル機能に対するコンテナ隔離を大幅に弱める設定。cap_add: ALLと組み合わさるため、本番機へ流用してはいけない。"
+    },
+    {
+      "path": "containers/compose.yaml",
+      "line": 97,
+      "type": "contextual_main_explanation",
+      "before": "subnet: 10.8.9.0/24 はネットワークのIPv4アドレス範囲（通常256個のアドレス）を指定。",
+      "after": "サブネット10.8.9.0/24はマスク255.255.255.0のIPv4範囲を指定し、固定IP10.8.9.2〜7をこのネットワーク内に配置する。末尾の/24はネットワークプレフィックス長であり、パス区切りではない。既存ネットワークと重複すると問題を起こし得る。"
+    },
+    {
+      "path": "containers/pentester/Dockerfile",
+      "line": 3,
+      "type": "contextual_main_explanation",
+      "before": "ENV TZ=Asia/Tokyo はコンテナ環境変数TZにIANA時間帯名Asia/Tokyoを設定する。これはディレクトリ名そのものではなくタイムゾーンの識別子。第6行で `/usr/share/zoneinfo/$TZ` というパスの末尾に展開される。",
+      "after": "ENVはイメージにTZという環境変数を設定する。Asia/TokyoはIANAタイムゾーンの識別子で、ここでは絶対パスやコマンドではない。第6行で/usr/share/zoneinfo/$TZの参照先に展開される。"
+    },
+    {
+      "path": "containers/pentester/Dockerfile",
+      "line": 6,
+      "type": "contextual_main_explanation",
+      "before": "ln -snf ... $TZ で時間帯ファイルをリンクし、/etc/timezoneへ文字列を書き出す。",
+      "after": "ln -snfは指定されたタイムゾーンファイルを/etc/localtimeへシンボリックリンクとして設定し、&&で成功時のみ後続のechoを動かす。$TZは第3行のAsia/Tokyoに展開され、>は/etc/timezoneへ書き込むリダイレクトである。この行はDockerビルド中に実行される。"
+    },
+    {
+      "path": "containers/pentester/Dockerfile",
+      "line": 9,
+      "type": "contextual_main_explanation",
+      "before": "apt-get update で索引更新、 upgrade -y でインストール済みパッケージ更新を試みる。",
+      "after": "apt-get updateでパッケージの索引を更新してからapt-get upgrade -yで既存パッケージを更新する。行末の\\はDockerfileのRUN命令を次行に続ける記号。&&は前コマンドが成功したときだけ後続を実行する。旧イメージを再現する例であり再現可能性のための版固定は不足している。"
+    },
+    {
+      "path": "containers/pentester/Dockerfile",
+      "line": 16,
+      "type": "contextual_main_explanation",
+      "before": "curl -sS ... | python3.11 はネットから取得したPythonスクリプトを即実行する構成。供給元改ざんやバージョン変更に弱く、再現時には厳密な取得物検証が必要。",
+      "after": "curl -sSで外部からget-pip.pyを取得し、|でその内容をpython3.11の標準入力へ直接渡して実行する。これはファイル保存・内容確認を経ずに取得内容を実行する危険なパターンであり、教材の原典保存のため記載されているが再実行は推奨しない。"
+    },
+    {
+      "path": "containers/pentester/Dockerfile",
+      "line": 21,
+      "type": "contextual_main_explanation",
+      "before": "外部リポジトリにあるMetasploitインストール用スクリプトをcurlで取得する。URLの内容は将来変わり得る。",
+      "after": "curlでGitHub上のmsfupdate.erbを取得し、>でmsfinstallというローカルファイルへ書く。認証・内容照合・バージョン固定がないため、後のchmodと実行まで含めて外部コード実行の供給網リスクがある。ここでの>は比較演算子ではなく出力先ファイル指定。"
+    },
+    {
+      "path": "containers/pentester/Dockerfile",
+      "line": 31,
+      "type": "contextual_main_explanation",
+      "before": "echo \"root:pentest\" | chpasswd でrootパスワードを演習用固定値にする。",
+      "after": "echoはroot:pentestという「ユーザー名:パスワード」の1行を作り、|によってchpasswdの標準入力へ送る。パスワードがDockerfileに平文で含まれ、イメージの構築記録などから露出し得る。これは演習用の固定認証情報であり、実サービスには利用しない。"
+    },
+    {
+      "path": "containers/pentester/Dockerfile",
+      "line": 53,
+      "type": "contextual_main_explanation",
+      "before": "git clone --depth 1 でSecListsを浅く取得する。外部リポジトリ・ネット接続・配布容量に依存し、イメージ再現性が弱い。",
+      "after": "git clone --depth 1はSecListsリポジトリの最新側履歴を浅く取得して/home/pentester/SecListsに配置する。コミットIDの固定がないためビルド日時により内容が変わり得る。USER pentester以降のためここは一般ユーザー権限で実行される。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-by-socket.py",
+      "line": 10,
+      "type": "contextual_main_explanation",
+      "before": "socket.socket() は既定で IPv4(AF_INET)・ストリーム(SOCK_STREAM)のソケットを作る。通常TCP用になるが、IPv6宛先はこのままでは扱わない。",
+      "after": "socket.socket()は引数省略時、通常はIPv4(AF_INET)・TCP向けストリームソケット(SOCK_STREAM)を作る。sはPython側のソケットオブジェクト。開いただけでは相手へ接続しておらず、次行でconnect_exを呼ぶ。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-by-socket.py",
+      "line": 11,
+      "type": "contextual_main_explanation",
+      "before": "connect_ex((target_ip, target_port)) がOSのTCP接続を試みる。外側の括弧は呼出し、内側の `(IP,port)` はタプル。0なら成功、非0ならエラー番号であり「必ず閉ポート」とは限らない。",
+      "after": "s.connect_ex((target_ip,target_port))は接続を試してOSのエラー番号を整数として返す。括弧が二重なのは、宛先の(IP,ポート)というタプルを1引数として渡すため。0は接続成功、非0は拒否・経路不可・タイムアウト等も含む。外側にタイムアウト設定がないため待機時間はOS条件に依存する。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-by-socket.py",
+      "line": 17,
+      "type": "contextual_main_explanation",
+      "before": "else は connect_ex の結果が0以外の場合。接続拒否、タイムアウト、到達不能、名前解決失敗などを全部 closed と表示するのは原典の単純化で、正確な診断としては不十分。",
+      "after": "このclosed表示は原典の二分岐による簡略化で、errnoが非0ならすべてここへ入る。ECONNREFUSEDとETIMEDOUTは異なり、接続失敗だけから「閉じている」と確定できない。信頼できるスキャナならerrno値を表示・分類する。"
+    },
+    {
+      "path": "code/chapter02/tcp-syn-scan.py",
+      "line": 11,
+      "type": "contextual_main_explanation",
+      "before": "`IP(dst=target_ip)` に宛先IP、`TCP(dport=target_port, flags=\"S\")` にポートとSYNフラグを設定。間の `/` はScapyの層結合演算子で、割り算ではない。",
+      "after": "IP(dst=target_ip)で宛先IPv4層、TCP(dport=target_port,flags=\"S\")でSYNフラグを付けたTCP層を作り、Scapyの/演算子で上下のパケット層を結合する。Pythonの数値除算ではない。送信元ポート・シーケンス番号等の既定値や自動補完はScapy側に依存する。"
+    },
+    {
+      "path": "code/chapter02/tcp-syn-scan.py",
+      "line": 14,
+      "type": "contextual_main_explanation",
+      "before": "sr1(syn_packet) はパケットを送信して最初の応答を待つ。呼び出しに timeout がなく、応答がないと待ち続ける可能性がある。戻り値がNoneのこともある。",
+      "after": "sr1はパケットを送って最初の応答を受け取るScapyの関数で、名前の1は最初の応答の意味。timeoutを明示しないので待ち続ける可能性がある。応答を得られないとNoneが返るが、第17行でNoneの検査をせずhaslayerを呼ぶため例外になり得る。"
+    },
+    {
+      "path": "code/chapter02/tcp-syn-scan.py",
+      "line": 18,
+      "type": "contextual_main_explanation",
+      "before": "条件の後半。`response_packet[TCP]` でTCP層を取り出し、その `flags` と `\"SA\"`（SYNとACKの組合せ）を比較する。`)` で前行の丸括弧を閉じ、`:` からifの本体が始まる。",
+      "after": "response_packet[TCP].flagsは返答のTCPフラグを読む。SAはSYN+ACKを意味するが、ここでは文字列との比較を行うScapy特有の表現。右側の閉じ括弧は前行で開いたif条件を閉じ、その直後のコロンで本体が始まる。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-v1.py",
+      "line": 24,
+      "type": "contextual_main_explanation",
+      "before": "`TCP(dport=..., flags=\"A\", ...)` はTCPのACKフラグだけを立てたヘッダーを組み立てる。`dport` は宛先ポート、`flags` は制御ビットを指定するキーワード引数。",
+      "after": "TCP(dport=target_port,flags=\"A\",ack=...,seq=...)は、受信したSYN/ACKへ対応するACKパケットを組み立てる。flags=\"A\"はACKビット、dportは宛先ポート。ackとseqはキーワード引数であり、Python変数への単独代入ではない。実際のTCP接続状態をカーネルと同期する処理ではない。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-v1.py",
+      "line": 29,
+      "type": "contextual_main_explanation",
+      "before": "`sr1(ack_packet, timeout=3)` でACKを送って応答を最大3秒待つ。正常なACKに必ずTCPの返答が来るわけではなく、Noneでも必ず異常とは言い切れない。",
+      "after": "sr1(ack_packet,timeout=3)はACK送信後、最大約3秒応答を待つ。しかしTCPの3ウェイハンドシェイク完了時に相手から必ず応答が来るわけではない。戻り値がNoneでも直前のSYN/ACKが無効だったと断定できない。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-v2.py",
+      "line": 31,
+      "type": "contextual_main_explanation",
+      "before": "`sr1(ack_packet, timeout=3)` はACKを送って最初の応答を最大およそ3秒待とうとする。しかし通常のTCPハンドシェイクの最後のACKに対して相手が追加パケットを送る保証はない。待機・無応答を接続失敗と断定できず、返り値も原典は捨てている。",
+      "after": "Scapyのsr1はACKを送信した後で追加パケットを最大約3秒待つ。正常な3ウェイハンドシェイクの最後のACKに通常は即時の返答を必要としないため、待機は通信の成功判定には使えない。戻り値を利用していない点も読んでおく。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-v2.py",
+      "line": 41,
+      "type": "contextual_main_explanation",
+      "before": "`sr1(fin_packet, timeout=3)` はFIN/ACK送信後の最初の応答を返す。相手がACKだけ返す、遅延する、何も返さない場合がある。Noneなら下のhaslayerは例外になる。",
+      "after": "FIN+ACKパケット送信後の最初の応答を受信する。相手は先にACKだけ返し、FINは別のパケットにすることもあるので、次のifで最初の応答がFAでないだけで終了失敗と判定できない。Noneの場合は第45行でhaslayerを呼び例外となる。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-v2.py",
+      "line": 45,
+      "type": "contextual_main_explanation",
+      "before": "`response_fin_packet.haslayer(TCP)` の前に None を確認していない。第41行のsr1は3秒のタイムアウトでNoneを返し得るので、その場合ここでAttributeErrorになる。FIN/ACKを受け取らないという観測は、切断失敗と直結するわけでもない。",
+      "after": "response_fin_packet.haslayer(TCP)は最初の応答がTCP層を持つかの確認。しかし直前のsr1が時間切れでNoneを返せば、NoneにはhaslayerがないのでAttributeErrorを起こす。TCP終了の一般的な状態機械としては不十分。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-v2.py",
+      "line": 55,
+      "type": "contextual_main_explanation",
+      "before": "終了成功というログ。ただし相手のTCP状態を厳密に検証する仕組みはない。",
+      "after": "Connection closedはifの条件に合ったときの文字列表示であり、カーネルのTCP接続状態や相手側の完全終了を確認した証拠ではない。送信側・受信側の両方のFINとACK、シーケンス進行の確認が本来必要となる。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 11,
+      "type": "contextual_main_explanation",
+      "before": "`[ \"$#\" -eq 0 ]` は位置引数の個数（`$#`）が0か数値比較する。1～2個の場合はここを通過するため、必要な `$2` を保証する検査としては不足。",
+      "after": "\"$#\"は位置引数の個数を表す特殊パラメータで、-eq 0は数値として0と等しいか比較する。空の場合だけエラーになるが、このスクリプトは次に$2を使うため、引数が1個だけのケースも先に検査する必要がある。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 17,
+      "type": "contextual_main_explanation",
+      "before": "`[ \"$1\" = \"-h\" ]` は第1引数が `-h` か文字列比較する。引数0個なら前の分岐ですでに終了している。",
+      "after": "\"$1\"が文字列-hと一致したときだけヘルプを表示する。[ ... ]はtestコマンドと同等で、=は文字列比較、;はthenと同じ行に置くためのコマンド区切り。引数のバリデーションとしてはこれだけでは不十分。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 33,
+      "type": "contextual_main_explanation",
+      "before": "hosts=`cat $2` は第2引数に指定されたファイルを cat で読み、その標準出力を変数hostsへ格納する。`...` は古いコマンド置換構文。$2が空だったり空白を含んだりすると失敗または誤った分割が起きる。",
+      "after": "`cat $2`は第2引数で指定されたファイルを読み、コマンド置換して変数hostsへ入れる。バッククォートは旧式のコマンド置換。$2が引用符なしなのでファイル名中の空白やワイルドカードで壊れ得る。さらにset -uにより未指定なら展開段階でエラーになる。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 39,
+      "type": "contextual_main_explanation",
+      "before": "exclude_option=\"--exclude ${exclude_hosts}\" でNmapへ渡す除外オプションを文字列として組み立てる。後で引用符なしで展開されるため、複数除外値や特殊文字を持つ入力の扱いは信頼できない。",
+      "after": "exclude_optionへ\"--exclude 10.8.9.6\"のような文字列を作る。後のnmap行で引用符なし展開し複数引数へ分割する設計だが、除外対象に空白等が含まれると意図外の引数にもなる。安全な引数配列を持たないPOSIX shでは入力形式の検証が重要。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 44,
+      "type": "contextual_main_explanation",
+      "before": "for h in $hosts は変数hostsの中身をシェルの単語分割とパス名展開に通し、得られた各語を順にhへ代入する。ホストファイルを正確に1行ずつ読む処理ではないため、空白・ワイルドカードを含む入力には弱い。",
+      "after": "for h in $hostsはhostsに入った文字列をIFSで単語分割し、各要素を変数hに割り当てて繰り返す。これはファイルの「1行」を確実に1対象として扱う方式ではない。ワイルドカードや空白が混じると対象が変化する。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 47,
+      "type": "contextual_main_explanation",
+      "before": "`` `echo $h | tr \"/\" \"_\"` `` はhを表示して `/` を `_` に置換しファイル名用にする。引用符なし `$h` は語分割・glob展開の問題がある。",
+      "after": "echo $hの文字列をtrで「/」から「_」に置換し、CIDR形式をファイル名にしやすくする。縦棒|は左コマンドの出力を右コマンドの入力へ渡すパイプ。hが未検証のままなのでスラッシュ以外の危険な文字までは無害化していない。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 57,
+      "type": "contextual_main_explanation",
+      "before": "sudo nmap ... を実際に起動する行。`${timing_template}` は第1引数（例 -T3）、`${exclude_option}` は任意の除外指定を展開する。ここでは両方を引用符なしで展開し、意図しない単語分割・パス名展開を招き得る。直前のechoは表示するだけで、実行するオプション一覧とは一致しない。",
+      "after": "このsudo nmap行が実際のスキャン実行箇所である。timing_templateは第1引数（-T3など）、exclude_optionは除外指定。-vは詳細表示、-nは逆引きDNSを行わない指定。変数が引用符なしで展開され、シェルの単語分割・ワイルドカード展開が起こり得る。認可された隔離環境以外で実行しない。"
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 58,
+      "type": "contextual_main_explanation",
+      "before": "`-p-` は全TCPポート、`-PS22,80,443` は発見用SYNプローブ、`-sS` はSYNスキャン、`--host-timeout 30m` は1ホスト最大30分。ここは前行の同一Nmapコマンドの続き。",
+      "after": "-p-は全TCPポート範囲を対象とし、-PS22,80,443は発見用のTCP SYN pingを指定、-sSはSYNスキャン、--host-timeout 30mは1ホストあたりの最大所要時間の設定。対象数により大量のパケットを送るため、許可された演習環境限定のコマンド。"
+    },
+    {
+      "path": "code/chapter03/nmap-xml2csv.rb",
+      "line": 22,
+      "type": "contextual_main_explanation",
+      "before": "`Nmap::XML.open(nmap_file)` でNmapのXMLファイルを開き、パーサのオブジェクトを `|xml|` に受け取る。gemのruby-nmapが必要。",
+      "after": "Nmap::XML.open(nmap_file)はruby-nmap側のXMLパーサで指定されたNmap出力を開き、do |xml|のブロック引数xmlに解析結果を渡す。メソッド名の::は名前空間を区切るRubyの定数参照記法。元データが不正な場合には例外になり得る。"
+    },
+    {
+      "path": "code/chapter03/nmap-xml2csv.rb",
+      "line": 29,
+      "type": "contextual_main_explanation",
+      "before": "`result += host.ip + \"\\t\"` はホストのIP文字列とタブを文字列resultの末尾に追加する。列の区切りにカンマではなくタブを使うため、出力ファイルが.csvという名前でもRFC準拠のCSVにはならない。第32行の複数ポートはさらにカンマとスペースで連結される。",
+      "after": "result += host.ip + \"\\t\"はIPアドレス文字列とタブ文字を結果文字列の末尾へ追加する。CSVのカンマ区切りではなく、列をタブで区切る設計である。各ホストについて最初のopenポートの前にだけ実行される。"
+    },
+    {
+      "path": "code/chapter03/nmap-xml2csv.rb",
+      "line": 32,
+      "type": "contextual_main_explanation",
+      "before": "`\"#{port.number}(#{port.service}), \"` の `#{...}` はRubyの式展開。ポート番号とサービス名を括弧でくくり、区切りのカンマと空白を末尾に追加する。",
+      "after": "\"#{port.number}(#{port.service}), \"はRubyの文字列補間でポート番号・サービス名を埋め込む。各ポートの末尾にカンマと空白を付けるが、これは複数ポートの表示用の区切りであってCSVフィールドの正しいエスケープ処理ではない。"
+    },
+    {
+      "path": "code/chapter03/nmap-xml2csv.rb",
+      "line": 36,
+      "type": "contextual_main_explanation",
+      "before": "`slice(0...-2)` は0番目から末尾の2文字手前までを切り出す。`...` は終点を含めない範囲、`-2` は末尾から2文字目の位置。",
+      "after": "result.slice(0...-2)は先頭から末尾2文字手前までの部分文字列を新しく返し、末尾の「, 」を落とそうとする。0...-2の...は終端を含まない範囲演算子であり、小数点でも省略記号でもない。直前のend_with?条件は\")\"だけでも真になるため、想定外の末尾に対しては切りすぎる。"
+    },
+    {
+      "path": "containers/postgres/Dockerfile",
+      "line": 4,
+      "type": "contextual_main_explanation",
+      "before": "`POSTGRES_INITDB_ARGS=--auth-host=md5` は公式Postgresイメージの初期化処理に渡す引数。ホスト接続の初期認証方式指定であり、全ての既存pg_hba設定を常に書き換える意味ではない。",
+      "after": "POSTGRES_INITDB_ARGS=--auth-host=md5はPostgres公式イメージの初回DBクラスタ生成でinitdbへ渡される引数を指定する。md5という名称でも接続するPostgreSQLのバージョン・パスワード保存方法で実際の認証動作に注意が要る。すでに初期化済みのデータディレクトリには再適用されない。"
+    },
+    {
+      "path": "containers/postgres/Dockerfile",
+      "line": 7,
+      "type": "contextual_main_explanation",
+      "before": "`COPY postgres/sql/* /docker-entrypoint-initdb.d/` は初回DBデータ領域作成時に実行するSQL等を用意する。既存ボリュームで既にDB初期化済みなら自動再実行されない。",
+      "after": "COPYはビルドコンテキストのpostgres/sql配下のSQLファイルをイメージ内の/docker-entrypoint-initdb.d/へ複製する。公式PostgreSQLイメージでは空のデータディレクトリを初期化した最初の起動時にこのディレクトリのSQLなどが処理される。Dockerfileのビルド時にSQLが実行されるわけではない。"
+    },
+    {
+      "path": "containers/postgres/Dockerfile",
+      "line": 8,
+      "type": "contextual_main_explanation",
+      "before": "`RUN echo ... >> /etc/postgresql/pg_hba.conf` はイメージ構築時に指定パスへ文字列を追記しようとする。しかしPostgreSQL公式イメージで実際に使うpg_hba.confは通常PGDATA配下に生成される。`/etc/postgresql` が存在しなければシェルのリダイレクト段階で失敗し、存在してもサーバの認証には反映されないおそれがある。",
+      "after": "RUNのシェルが/etc/postgresql/pg_hba.confへ追記を試みる行。>>はファイル末尾への追記、\"host all all 0.0.0.0/0 md5\"は全IPv4送信元に関する認証規則を意図する。ただし公式postgresイメージで実際に有効なpg_hba.confは初回起動時にPGDATA下で生成されるため、このパスへの書込みは反映されない可能性が高い。ビルドでディレクトリが存在しなければ失敗もあり得る。"
+    },
+    {
+      "path": "containers/nginx/vulnerable.conf",
+      "line": 10,
+      "type": "contextual_main_explanation",
+      "before": "`location /static {` はURIが /static で始まる場合に適用するプレフィックスlocation。`/static`以外に`/staticXYZ`にも一致し得る。次行のalias末尾に`/`がある一方でlocation側にないため、ファイルパスの組立てが直感とずれやすい。",
+      "after": "location /staticはURIの先頭が/staticに一致するリクエストを対象にする。末尾に/がないため/staticfooのような経路もプレフィックス一致の候補になり、次のaliasとの結合を意図どおりに扱えない場合がある。"
+    },
+    {
+      "path": "containers/nginx/vulnerable.conf",
+      "line": 11,
+      "type": "contextual_main_explanation",
+      "before": "`alias /var/www/app/static/;` はlocationと一致したURI接頭辞をサーバ上のディレクトリに置き換える。`root`と違い「locationの接頭辞を差し替える」ため、第10行との末尾スラッシュの非対称性がパス解決を複雑にし、意図しないファイルへのアクセスにつながり得る。",
+      "after": "aliasはlocationに一致したURI接頭辞を指定パスへ置換するNginxディレクティブ。ここではlocationが/static（末尾スラッシュなし）、aliasが/var/www/app/static/（末尾あり）なので、意図した静的配信と異なるパス解決やアクセス制御上の問題が生じ得る。rootとはURLからパスへの対応方法が違う。"
+    },
+    {
+      "path": "containers/bind/config/named.conf",
+      "line": 22,
+      "type": "contextual_main_explanation",
+      "before": "listen-on port 53 { でIPv4 DNS待受のアドレス集合を指定し始める。",
+      "after": "listen-on port 53はBINDがDNS要求を受け付けるIPv4インターフェース・ポートを設定し、下位のinternal-network ACLで許可対象の待受先アドレスを指定する。allow-queryで問い合わせ元を制限することとは別の制御である。"
+    },
+    {
+      "path": "containers/bind/config/named.conf",
+      "line": 26,
+      "type": "contextual_main_explanation",
+      "before": "`allow-query { internal-network; };` はBINDがクエリを受け付ける送信元を第9〜11行で定義したACLに制限する。`allow-recursion`（第29行）は再帰解決を許す送信元の別設定で、単に同じACLを使っていても役割は違う。",
+      "after": "allow-queryは誰からDNS質問を受け付けるかを、internal-network ACLにより制限する設定。recursionの許可やゾーン転送の可否をこの1行だけで決めるものではない。"
+    },
+    {
+      "path": "containers/bind/config/named.conf",
+      "line": 29,
+      "type": "contextual_main_explanation",
+      "before": "`allow-recursion { internal-network; };` は再帰問い合わせを代行してよい送信元を制限する。通常の問い合わせの許可範囲を定める`allow-query`とは異なり、他の名前サーバへ問い合わせて答えを得る機能のアクセス制御である。",
+      "after": "allow-recursionは再帰解決を依頼できるクライアントをinternal-networkに制限する。上のallow-queryは質問受付全般の制限で、こちらは再帰利用の制限。オープンリゾルバー化を避ける上で異なる意味を持つ。"
+    },
+    {
+      "path": "containers/bind/config/named.conf",
+      "line": 36,
+      "type": "contextual_main_explanation",
+      "before": "allow-transfer { none; } でゾーン転送の許可元をなしにする。",
+      "after": "allow-transfer { none; };はゾーン情報を別のDNSサーバへ転送する要求(AXFR/IXFRなど)を許可しない。allow-queryやallow-recursionと違い、DNSゾーン複製の権限を制御する。"
+    },
+    {
+      "path": "code/chapter02/CVE-2020-8617.py",
+      "line": 14,
+      "type": "contextual_main_explanation",
+      "before": "`DNSRRTSIG(...)` でDNSのTSIG形式（type 250）を作り始める。名前にSIGが入るがDNSSECのRRSIG(type 46)とは違う。`rrname` は鍵名、`algo_name` はHMAC方式。",
+      "after": "DNSRRTSIGはScapyのクラス名だが、この場ではTSIG(type 250)の構造を組み立てている。rrnameはTSIG鍵名、algo_nameはHMACアルゴリズム名。DNSSECのRRSIG(type 46)レコードと同じものだと誤解しないこと。"
+    },
+    {
+      "path": "code/chapter02/CVE-2020-8617.py",
+      "line": 23,
+      "type": "contextual_main_explanation",
+      "before": "`response is None` という第22行の条件が真になったとき、原典は成功したかもしれないと表示する。しかし3秒間応答がなかったことしか確認できず、サーバがクラッシュした、脆弱性が存在する、攻撃に成功した、とは結論できない。ネットワーク遮断や正常なタイムアウトでも同じ表示になる。",
+      "after": "応答がNoneなら「攻撃が成功したかもしれない」と表示するだけで、BINDが停止した事実は確認していない。タイムアウト、UDPフィルタ、通信損失、誤った宛先でもNoneになり得る。サービス停止判定には別の独立した健全性確認が必要だが、ここでは危険な検証を実行しない。"
+    },
+    {
+      "path": "containers/log4j/build.gradle",
+      "line": 19,
+      "type": "contextual_main_explanation",
+      "before": "`spring-boot-starter-log4j2:2.6.1` はSpring Boot側のスターターのバージョンを指定している。log4j-core本体のバージョンが必ず2.6.1になるという意味ではなく、依存解決を確認しなければ断定できない。",
+      "after": "spring-boot-starter-log4j2:2.6.1の2.6.1はこのSpring Bootスターターの依存指定バージョンであって、Log4jコア本体のバージョンを直接表す数字ではない。実際の依存解決で使用されるLog4jの版はGradleの依存関係グラフを調べないと断定できない。"
+    },
+    {
+      "path": "containers/log4j/src/main/java/fr/christophetd/log4shell/vulnerableapp/MainController.java",
+      "line": 17,
+      "type": "contextual_main_explanation",
+      "before": "`@RequestHeader(\"X-Api-Version\")` でHTTPリクエストヘッダーの値を引数apiVersionに結びつける。requiredの既定はtrueで、ヘッダーがなければコントローラ実行前に4xx応答になり得る。次行でその外部入力をそのままLog4jのlogger.infoへ渡すのが学習上の検査点。",
+      "after": "@RequestHeader(\"X-Api-Version\")はHTTPリクエストのX-Api-Versionヘッダーから値を引数apiVersionへ渡す。ヘッダーが必須かなどはSpringのアノテーションの既定値に依存する。引数のStringはJavaの文字列型であり、HTTPヘッダー値を信用してよいという意味ではない。"
+    },
+    {
+      "path": "containers/log4j/src/main/java/fr/christophetd/log4shell/vulnerableapp/MainController.java",
+      "line": 18,
+      "type": "contextual_main_explanation",
+      "before": "`logger.info(...)` は情報レベルのログを記録する。固定文字列と外部ヘッダーapiVersionを`+`で結合して1つのログ文字列にするため、ユーザー制御の内容がログ処理系に渡る。原典は古いLog4j関連依存関係を含む演習用アプリであり、外部に公開してはいけない。",
+      "after": "logger.infoは文字列連結したログメッセージをINFOレベルで記録する。+はここでは文字列連結で、入力apiVersionを検証せずに組み込む。ログ記録時の挙動は使用ライブラリの実際のバージョンや設定に依存する。"
+    },
+    {
+      "path": "code/chapter05/shellcode-runner.go",
+      "line": 12,
+      "type": "contextual_main_explanation",
+      "before": "`fork()` は成功時、親プロセスには正の子PID、子プロセスには0を返す。失敗したときは-1でCのifでは真になり、親としてreturnしてしまう。この行にはエラー用の分岐がなく、失敗を明示的に扱えない。",
+      "after": "Cのfork()は親には子プロセスのPID（正数）、子には0、失敗時には-1を返す。if(fork())では親と失敗側がreturnし、0になる子だけが後続処理へ進む。fork失敗を区別せず捨てる実装であり、処理が安全に隔離されたことを示すものではない。"
+    },
+    {
+      "path": "code/chapter05/shellcode-runner.go",
+      "line": 18,
+      "type": "contextual_main_explanation",
+      "before": "`MAP_ANONYMOUS|MAP_PRIVATE` はファイルを使わないプライベートメモリ。ファイル記述子は-1、オフセットは0とする。最後の `);` でmmap呼び出しを閉じる。",
+      "after": "mmapのPROT_READ|PROT_WRITE|PROT_EXECは同じページに読み・書き・実行権限を同時付与する。縦棒はCのビット単位ORで、シェルのパイプではない。MAP_ANONYMOUS|MAP_PRIVATEは匿名かつ非共有のマッピング、-1と0は匿名マッピングでfdとoffsetに通常用いる値である。RWXは危険であり実行しない。"
+    },
+    {
+      "path": "code/chapter05/shellcode-runner.go",
+      "line": 24,
+      "type": "contextual_main_explanation",
+      "before": "`(*(void(*)()) memory)()` はmemoryを「引数なし・戻り値なしの関数へのポインタ」のように解釈して呼ぶ式。通常のデータ領域を実行する非常に危険な動作。実行可能性・移植性は保証されない。",
+      "after": "((void(*)())memory)()は確保したメモリの先頭を「引数指定なし・void戻り値の関数ポインタ」とみなして呼び出す、C言語で危険度が高い式。最後の()が呼び出しを行う。バイト列が有効な機械語でなければ異常終了や任意動作を招き、正しい型安全性も保証しない。"
+    },
+    {
+      "path": "code/chapter05/shellcode-runner.go",
+      "line": 35,
+      "type": "contextual_main_explanation",
+      "before": "`shellCodeBin, err := hex.DecodeString(shellCodeStr)` は関数が返す2つの値を受け取るGoの短い変数宣言。左の2名にそれぞれバイトスライスとerrorが入る。`:=`は1個の演算子で、`: と =`に分割した別々の演算ではない。原典の説明用日本語文字列は16進数でないためここではerrが非nilとなる。",
+      "after": "hex.DecodeString(shellCodeStr)は16進数文字列をバイト列へ変換し、その結果とerrorを2値で返す。Goの:=は短い変数宣言演算子1個であり、:と=という独立した2演算子ではない。原典の日本語プレースホルダーは16進数でないため変換が失敗し、通常は次のerr!=nilでreturnとなる。"
+    },
+    {
+      "path": "code/chapter05/shellcode-runner.go",
+      "line": 44,
+      "type": "contextual_main_explanation",
+      "before": "`&shellCodeBin[0]` は最初のバイトのアドレス、`unsafe.Pointer` は一般的な型安全検査を越えるポインタ型、`(*C.char)` はcgoのC文字型ポインタへの変換。空のスライスには添字0がなく、C側で使用中のGoメモリについてcgoのポインタ規則にも注意が要る。ここから先は任意バイトを実行可能メモリへ渡す危険な処理なので実行しない。",
+      "after": "&shellCodeBin[0]でバイトスライスの最初の要素へのアドレスを取得し、unsafe.Pointerから*C.char相当へ型変換してC.callへ渡す。空スライスには添字0がないためpanicする。cgo境界ではGoメモリの参照保持とポインタ規則にも注意が要る。任意コードを実行するサンプルなのでビルドのみとし実行はしない。"
+    },
+    {
+      "path": "code/chapter06/libsniffer.c",
+      "line": 6,
+      "type": "contextual_main_explanation",
+      "before": "`int (*ssl_write)(SSL *,const void *,int)` は元のSSL_writeと同型の関数を指すポインタ宣言。`(*ssl_write)` の括弧がないと関数を返す宣言と区別できない。",
+      "after": "ssl_writeはSSL_writeと同じ引数・戻り値を持つ関数へのポインタを宣言する。`int (*ssl_write)(...)`で*を括弧に入れるのは「関数そのものを定義する」のではなく「関数を指す変数」を作るため。元のSSL_writeに委譲する前にログ処理を差し込む仕組み。"
+    },
+    {
+      "path": "code/chapter06/libsniffer.c",
+      "line": 7,
+      "type": "contextual_main_explanation",
+      "before": "`dlsym(RTLD_NEXT,\"SSL_write\")` は現在のフックより後に探索される共有オブジェクトから元の関数シンボルを調べる。見つからない場合にはNULLになり得るがチェックせず次行以降で使う。`void*`と関数ポインタの相互変換は一般のISO Cでは可搬性を保証しない。",
+      "after": "dlsym(RTLD_NEXT,\"SSL_write\")は動的リンクの探索順序で現在のフックより後に見つかるシンボルを調べる。戻り値が見つからなければNULLだが、原典は検査せず第11行で関数ポインタを呼ぶ。ISO Cだけではvoid*から関数ポインタへの変換の可搬性を保証できない。"
+    },
+    {
+      "path": "code/chapter06/libsniffer.c",
+      "line": 8,
+      "type": "contextual_main_explanation",
+      "before": "`fopen(\"/tmp/ssl_hook_log\",\"a+\")` はログファイルを追記更新モードで開こうとする。`a+` は読み書きと末尾追記で、機密性を保証しない。失敗時にNULLを返すため第9行と第10行へ進む前に検査が必要だが原典にはない。",
+      "after": "fopenの\"a+\"は既存ファイルを追記読み書き用に開き、なければ作成しようとする。/tmp/ssl_hook_logは共有一時ディレクトリ内のログで、他ユーザーやシンボリックリンクなどに注意が必要。失敗時はNULLを返すが原典は検査せずfprintfとfcloseに渡す。"
+    },
+    {
+      "path": "code/chapter06/libsniffer.c",
+      "line": 9,
+      "type": "contextual_main_explanation",
+      "before": "`fprintf(logfile,\"%s\\n\",(char *)buf)` は送信バッファの先頭からNULバイトまで読み続ける。`num`を無視しているため範囲外読み取りや秘密情報漏えいが起こり得る。`logfile` がNULLのときの呼出しも不正。学習時には実行せず、サイズを指定した書き込みが必要である点を考える。",
+      "after": "fprintf(logfile,\"%s\\n\",(char *)buf)の%sはNUL終端文字列を前提にするが、SSL_writeのbufは長さnumを伴う任意バイト列で、終端NULの保証がない。numを無視して走査するため範囲外読取や秘密情報の記録があり得る。logfileがNULLのときも不正。ここで安全な挙動が実証されたと思ってはならない。"
+    },
+    {
+      "path": "code/chapter06/libsniffer.c",
+      "line": 11,
+      "type": "contextual_main_explanation",
+      "before": "`ssl_write(ssl,buf,num)` は元のSSL_writeへ同じ引数を転送して戻り値を返す。検索に失敗したNULL関数ポインタを呼ぶと危険。",
+      "after": "ssl_write(ssl,buf,num)はdlsymで見つけた元のSSL_write関数に同じ3引数を渡し、その戻り値を呼出元へ返す。sslはOpenSSLのSSL接続へのポインタ、bufは送信するバイト列、numはその長さ。関数ポインタがNULLならこの間接呼び出しは不正。"
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 14,
+      "type": "contextual_main_explanation",
+      "before": "設定パスを 'w' で開く。開いたときに書込可能性が必要で、一般ユーザーではPermissionErrorになりやすい。",
+      "after": "with open(ip_forward_path,\"w\") as fはLinuxカーネルの/proc/sys/net/ipv4/ip_forwardを更新用に開く。IP転送の設定をOSまたはコンテナのネットワーク名前空間へ影響させ得る。withはブロックを抜けるとファイルを閉じるが、カーネル設定を元の値へ戻すわけではない。"
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 19,
+      "type": "contextual_main_explanation",
+      "before": "`Ether(dst=\"ff:ff:ff:ff:ff:ff\")` はEthernetブロードキャスト、`/ARP(...)` はARP要求の層結合。`srp1` はL2フレームを送って最初の返答を待つ。",
+      "after": "Ether(dst=\"ff:ff:ff:ff:ff:ff\")はL2ブロードキャスト宛Ethernetフレームを生成し、/はScapyの層結合でARP要求を続ける。ARPは同じL2セグメント上でしか機能しない。一般のIPルーティングを越えて未知のMACを取得する処理ではない。"
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 22,
+      "type": "contextual_main_explanation",
+      "before": "返答パケットがあるときだけ次行でMACを取得する。",
+      "after": "srp1の応答を受け取れているときだけresponse.src（送信元MACアドレス）を返す。タイムアウトではNoneとなり第24行へ進む。後のspoof関数はNoneを得た場合の送信前検査をしていない。"
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 29,
+      "type": "contextual_main_explanation",
+      "before": "`ARP(pdst=target_ip,hwdst=target_mac,...)` は応答の受信対象IPとMACを設定する。target_macがNoneの場合の扱いは原典で検証していない。",
+      "after": "ARP(pdst=target_ip,hwdst=target_mac,psrc=destination_ip,op=\"is-at\")は対象に宛てるARP応答風の情報を組み立てる。pdstは通知先IP、hwdstは宛先MAC、psrcは「このIPに対するMAC」という送信元IP欄。別端末のIPを名乗るため通信妨害につながり得る。許可された専用演習環境以外では実行しない。"
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 31,
+      "type": "contextual_main_explanation",
+      "before": "send(..., verbose=0) でARPメッセージを送出する。配布先によっては通信妨害や傍受が発生する。",
+      "after": "send(arp_response,verbose=0)はScapyでIP層側の送信関数を呼ぶ。ARPはリンク層のプロトコルなので、Ether/ARPを作ってsendpを利用する構成とは異なる。実際にパケットが意図どおり送られるとは限らない点は原典の実装上の問題。"
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 40,
+      "type": "contextual_main_explanation",
+      "before": "count=5 で複数回通知する。復元確実性は宛先のARPキャッシュ更新挙動に依存する。",
+      "after": "count=5は同一ARP通知を5回送るScapyの引数。相手のARPキャッシュが復旧したことを検証するわけではない。送信元と宛先MACが取得できないときの例外処理がなく、確実な復旧保証はない。"
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 58,
+      "type": "contextual_main_explanation",
+      "before": "`enable_ip_forward()` はLinuxカーネルのIPv4転送を有効にする。このコードには元の設定を読み戻す処理がなく、終了後もホスト側へ影響が残り得る。",
+      "after": "enable_ip_forward()をここで呼ぶと、プログラム開始時にIP転送が有効になる。対応する元の値の保存やfinallyでの復元がないため、Ctrl+C後も設定が残る可能性がある。プロセス単位の一時的なフラグではない。"
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 60,
+      "type": "contextual_main_explanation",
+      "before": "`Process(target=sniff_icmp)` で別プロセスにキャプチャを割り当てる。`target` は関数オブジェクトであり文字列のIPではない。",
+      "after": "multiprocessing.Process(target=sniff_icmp)はsniff_icmpを別プロセスで起動する準備であり、括弧のないsniff_icmpは関数オブジェクトそのものを渡している。Process作成だけではまだ起動せず、次行のstart()が実行開始。"
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 68,
+      "type": "contextual_main_explanation",
+      "before": "Ctrl+Cによる KeyboardInterrupt だけを捕捉する。それ以外の例外や強制終了では復元処理が実行されない。",
+      "after": "except KeyboardInterruptはCtrl+C等によるKeyboardInterruptのみを捕捉して復旧処理へ進む。その他の例外、強制終了、電源断では復旧しない。try/finallyでもすべての強制終了に対処できるわけではない。"
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 71,
+      "type": "contextual_main_explanation",
+      "before": "逆方向にもARP復旧を試みる。原典は例外をKeyboardInterruptに限定しているため、他の例外発生時には復旧ブロックが実行されない。",
+      "after": "restore(destination,target)は2方向目のARP訂正通知を送る。ただし親が生成したキャプチャ子プロセスのterminate/joinをしておらず、IP転送設定も戻さない。ここまで進んだことだけで元のネットワーク状態に完全復帰したとは言えない。"
+    },
+    {
+      "path": "code/chapter02/tcp-connect-scan-by-socket.py",
+      "line": 11,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          "connect_ex",
+          "socket.connect_exはconnectとは異なり通常の接続失敗を戻り値のOSエラー番号として返す。"
+        ],
+        [
+          "((target_ip, target_port))",
+          "外側は関数呼出しの括弧、内側の(target_ip,target_port)は宛先を1組にしたタプル。"
+        ],
+        [
+          "errno",
+          "成功なら0。失敗原因は他の数値に区別されるため一律closedではない。"
+        ]
+      ]
+    },
+    {
+      "path": "code/chapter02/tcp-syn-scan.py",
+      "line": 11,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          "IP(dst=target_ip)",
+          "IPv4ヘッダー層を作る。dstは宛先アドレスを指定するキーワード引数。"
+        ],
+        [
+          "/",
+          "Scapyがパケット層を積み重ねるために多重定義した演算子であり算術除算ではない。"
+        ],
+        [
+          "TCP(dport=target_port, flags=\"S\")",
+          "TCPヘッダー層を生成し、宛先ポートdportとSYNを表すflagsを設定する。"
+        ]
+      ]
+    },
+    {
+      "path": "code/chapter03/portscan-tcp-all.sh",
+      "line": 57,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          "sudo",
+          "権限を昇格して次のnmapコマンドを実行する。実行権限と対象の許可が必要。"
+        ],
+        [
+          "nmap",
+          "ホスト・ポート・サービスの状態を調べる外部コマンドで、Shellの構文ではない。"
+        ],
+        [
+          "${timing_template}",
+          "第1引数から得たタイミング指定。適切な形式か検証されていない。"
+        ],
+        [
+          "${exclude_option}",
+          "--excludeと対象値の文字列。引用符なし展開は単語分割される。"
+        ],
+        [
+          "\\（行末）",
+          "Shellの行継続。直後の改行を論理的に取り除き次行まで1コマンドとする。"
+        ]
+      ]
+    },
+    {
+      "path": "code/chapter05/shellcode-runner.go",
+      "line": 24,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          "void(*)()",
+          "戻り値voidで引数プロトタイプを指定していない関数を指すCの関数ポインタ型。"
+        ],
+        [
+          "memory",
+          "mmapで取得した生メモリの先頭アドレス。"
+        ],
+        [
+          "キャストの外側の()",
+          "memoryを関数ポインタに解釈させる部分。"
+        ],
+        [
+          "末尾の()",
+          "キャスト結果を関数として呼び出す、危険な操作。"
+        ]
+      ]
+    },
+    {
+      "path": "code/chapter05/shellcode-runner.go",
+      "line": 35,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          ":=",
+          "Goの短い変数宣言演算子。コロンと等号の独立した2個の演算子ではない。"
+        ],
+        [
+          "shellCodeBin",
+          "hex.DecodeStringが返すバイトスライス。"
+        ],
+        [
+          "err",
+          "hex.DecodeStringが返すerror値で、成功時はnil。"
+        ],
+        [
+          "hex.DecodeString",
+          "文字列の16進文字をバイトに戻す関数。非16進文字があるとエラーを返す。"
+        ]
+      ]
+    },
+    {
+      "path": "code/chapter06/libsniffer.c",
+      "line": 6,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          "int",
+          "関数ポインタが指す関数の戻り値型。"
+        ],
+        [
+          "(*ssl_write)",
+          "ポインタ変数名を括弧に入れ、関数ポインタであることを指定する。"
+        ],
+        [
+          "SSL *ssl",
+          "SSLオブジェクトを指す第1引数。"
+        ],
+        [
+          "const void *buf",
+          "読み出し対象の送信バイト列を指す第2引数。"
+        ],
+        [
+          "int num",
+          "送信バイト数を指定する第3引数。"
+        ]
+      ]
+    },
+    {
+      "path": "code/chapter06/libsniffer.c",
+      "line": 9,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          "fprintf",
+          "FILE*に対して書式付き文字列を書き込む関数。"
+        ],
+        [
+          "logfile",
+          "fopenの戻り値でありNULLの可能性がある。"
+        ],
+        [
+          "\"%s\\n\"",
+          "%sがNUL終端を仮定し、\\nは改行。numに基づく長さ制限は一切ない。"
+        ],
+        [
+          "(char *)buf",
+          "const void*をchar*へキャスト。NUL終端保証は発生しない。"
+        ]
+      ]
+    },
+    {
+      "path": "containers/postgres/Dockerfile",
+      "line": 8,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          "RUN",
+          "Dockerイメージのビルド段階で実行する命令。初回コンテナ起動ではない。"
+        ],
+        [
+          "echo",
+          "pg_hba.conf向けの認証ルール文字列を標準出力へ出す。"
+        ],
+        [
+          ">>",
+          "ファイル末尾への追記リダイレクト。ファイルが存在しなければ作成を試す。"
+        ],
+        [
+          "/etc/postgresql/pg_hba.conf",
+          "原典が追記を試す場所。公式postgresイメージの有効な認証設定パスと限らない。"
+        ]
+      ]
+    },
+    {
+      "path": "containers/nginx/vulnerable.conf",
+      "line": 11,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          "alias",
+          "一致したURLのlocation接頭辞を指定したファイルパスへ置換するNginx命令。"
+        ],
+        [
+          "/var/www/app/static/",
+          "ファイルを探すローカル側ディレクトリパス。末尾/の扱いがlocationと揃っていない。"
+        ]
+      ]
+    },
+    {
+      "path": "containers/log4j/build.gradle",
+      "line": 19,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          "implementation",
+          "Gradleで本番コード用の依存関係を宣言する。"
+        ],
+        [
+          "spring-boot-starter-log4j2",
+          "Spring BootのLog4j2連携スターターであり、Log4jコアライブラリそのものの名前ではない。"
+        ],
+        [
+          "2.6.1",
+          "この依存宣言で指定したSpring Bootスターターのバージョン。解決後の全推移依存と同一ではない。"
+        ]
+      ]
+    },
+    {
+      "path": "containers/pentester/code/chapter02/sniff-icmp-by-arp-spoofing.py",
+      "line": 60,
+      "type": "curated_token_specifics",
+      "units": [
+        [
+          "Process",
+          "multiprocessingの子プロセスオブジェクトを準備するクラス。"
+        ],
+        [
+          "target=sniff_icmp",
+          "実行対象の関数オブジェクトを渡すキーワード引数。ここにsniff_icmp()と書くとその場で呼んでしまう。"
+        ],
+        [
+          "sniff_process",
+          "作成した子プロセスオブジェクトを入れる変数。"
+        ]
+      ]
+    }
+  ]
+}

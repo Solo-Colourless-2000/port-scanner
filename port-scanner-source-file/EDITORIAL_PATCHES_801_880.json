@@ -1,0 +1,31 @@
+{
+  "version": 880,
+  "baseline_sha256": "5a2aab08735f31a2786d41a3194a619fcf011ec02ca831edd971a6b00e32f8d0",
+  "final_sha256": "1ee924ea76e94019a0ca162bfd018dfb62ccba021e087a1b8b40321e6bc9cd5e",
+  "phase_pre_rounds": 40,
+  "phase_post_rounds": 40,
+  "test_count": 44,
+  "original_source_changed": false,
+  "changes": [
+    {
+      "file": "portfolio_lab/report_diff.py",
+      "change": "reject NaN, Infinity and -Infinity using json.loads parse_constant; preserve duplicate-key checks and float finite validation",
+      "reason": "Python permissive JSON parser accepts non-standard numeric constants, even inside otherwise ignored fields"
+    },
+    {
+      "file": "portfolio_lab/tests/test_report_diff.py",
+      "change": "two new unittest methods: three constant strings and exponent overflow; update existing NaN expectation",
+      "reason": "distinguish JSON syntax rejection from numeric range validation"
+    },
+    {
+      "file": "portscanner_pentest_development_manual_v880_20261117.html",
+      "change": "updated all 411 report-comparison lines and ten interleaved stages, dedicated beginner explanation and safe usage",
+      "reason": "manual source code must match working sample byte for byte"
+    },
+    {
+      "file": "README_最初に読む.md",
+      "change": "replace confusing legacy output file name, reflect 44 tests and 411 lines, clarify portfolio evidence",
+      "reason": "reference design should not be reflected in the deliverable filename"
+    }
+  ]
+}
