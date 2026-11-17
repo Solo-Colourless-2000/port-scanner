@@ -1,9 +1,0 @@
-__pycache__/
-*.py[cod]
-.venv/
-.pytest_cache/
-*.log
-report-*.json
-before.json
-after.json
-difference.json
