@@ -1,9 +1,0 @@
-services:
-  bind:
-    build:
-      context: .
-      dockerfile: ./bind/Dockerfile
-    container_name: pentest-book-bind
-    tty: true
-    cap_add:
-      - ALL
