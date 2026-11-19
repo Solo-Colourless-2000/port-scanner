@@ -51,8 +51,9 @@ if syn_response is not None and syn_response.haslayer(TCP) and syn_response[TCP]
             flags="A"
         )
         final_ack_packet = ip_layer / final_ack_tcp_layer
-
         final_ack_response = sr1(final_ack_packet, timeout=3)
+
+        print(f"-----\nFinal ACK response: {final_ack_response}\n-----")
     elif fin_response is not None and fin_response.haslayer(TCP) and fin_response[TCP].flags != "FA":
         print(f"-----\nResult: Response is not FIN/ACK\n-----")
     elif fin_response is None:
@@ -68,21 +69,25 @@ else:
     print(f"-----\nResult: Unexpected non-TCP response\n-----")
 
 """
-| 変数名                 | 内容                 |
-| --------------------- | ------------------ |
-| `target_ip`           | スキャン対象のIPアドレス |
-| `target_port`         | 宛先ポート         |
-| `ip_layer`            | この時点ではIP層だけを構築 |
-| `syn_tcp_layer`       | SYN用のTCPヘッダー       |
-| `syn_packet`          | 実際に送信するSYNパケット     |
-| `syn_response`        | SYNに対する応答          |
-| `ack_tcp_layer`       | ACK用のTCPヘッダー       |
-| `ack_packet`          | 送信するACKパケット        |
-| `ack_response`        | ACK送信後に受信した応答      |
-| `fin_ack_tcp_layer`   | FIN/ACK用のTCPヘッダー   |
-| `fin_ack_packet`      | 送信するFIN/ACKパケット    |
-| `fin_response`        | FIN/ACK送信後の応答      |
-| `final_ack_tcp_layer` | 最後のACK用TCPヘッダー     |
-| `final_ack_packet`    | 最後に送信するACKパケット     |
-| `final_ack_response`  | 最後のACK送信後の応答       |
+「*_tcp_layer」: TCPヘッダーを構築したもの
+「*_packet」: IPヘッダーとTCPヘッダーを組み合わせた送信用パケット
+「*_response」: 送信後に受信した応答
+----
+
+target_ip: スキャン対象のIPアドレス
+target_port: 宛先ポート
+ip_layer: この時点ではIP層だけを構築
+syn_tcp_layer: SYN用のTCPヘッダー
+syn_packet: 実際に送信するSYNパケット
+syn_response: SYNに対する応答
+ack_tcp_layer: ACK用のTCPヘッダー
+ack_packet: 送信するACKパケット
+ack_response: ACK送信後に受信した応答
+fin_ack_tcp_layer: FIN/ACK用のTCPヘッダー
+fin_ack_packet: 送信するFIN/ACKパケット
+fin_response FIN/ACK送信後の応答
+final_ack_tcp_layer: 最後のACK用TCPヘッダー
+final_ack_packet: 最後に送信するACKパケット
+final_ack_response: 最後のACK送信後の応答
+
 """
