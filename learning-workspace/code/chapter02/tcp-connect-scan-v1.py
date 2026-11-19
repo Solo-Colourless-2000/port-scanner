@@ -7,27 +7,31 @@ port = int(sys.argv[2])
 conf.L3socket = L3RawSocket
 
 ip_packet = IP(dst=dst_ip)
-tcp = TCP(dport=port, flags="S")
-ip_tcp = ip_packet / tcp
+tcp_syn = TCP(dport=port, flags="S")
+ip_tcp_syn = ip_packet / tcp_syn
 
 print("Sending a SYN packet...")
-response = sr1(ip_tcp, timeout=2)
+response = sr1(ip_tcp_syn, timeout=2)
 
 print(f"-----\nResponse: {response}\n-----")
 
-# If the client captures a response with a SYN/ACK packet from a server, it respond to the server with an ACK packet.
+# If the client receives a SYN/ACK packet from the server, it sends an ACK packet to the server.
 if response is not None and response.haslayer(TCP) and response[TCP].flags == "SA":
-
-    ack = TCP(dport=port, response[TCP].seq, response[TCP].ack, flags="A") 
-    ack_reply = sr1(ack, timeout=3)
+    tcp_ack = TCP(
+            dport=port,
+            sport=tcp_syn.sport,
+            seq=response[TCP].ack, 
+            ack=response[TCP].seq + 1, 
+            flags="A"
+    ) 
+    ip_tcp_ack = ip_packet / tcp_ack
+    ack_reply = sr1(ip_tcp_ack, timeout=3)
 
     print(f"-----\nResult: {ack_reply}\n-----")
-else if :
+elif response is not None and response.haslayer(TCP) and response[TCP].flags != "SA":
     print(f"-----\nResult: Response is not SYN/ACK\n-----")
-    
+elif response is None:
+    print(f"-----\nResult: No Response\n-----")
 else:
-
-    print(f"-----\nResult: No Response or response timeout\n-----")
-
-
+    print(f"-----\nResult: Unexpected non-TCP response\n-----")
 
